@@ -4,9 +4,13 @@ library(ggplot2)
 #library(MeltR)
 library(shiny)
 
-# Define UI ----
+# The UI consists of a navbar page, with a single drop down menu, "File" , which contains a single option "Add data".
 ui <- navbarPage("MeltShiny",
                  navbarMenu("File",
+                            # When the user clicks the "Add Data" tab panel, a fluid page is created below the nav bar.
+                            # This page contains a side bar panel and a main panel.
+                            # The side bar contains the given options a user has when they click one of the options in the nav bar.
+                            # The main panel contains the graphs or tables.
                             tabPanel("Add Data", 
                                      fluidPage(
                                        sidebarLayout(
@@ -20,7 +24,20 @@ ui <- navbarPage("MeltShiny",
                                                      accept = ".csv")
                                          ),
                                          mainPanel(
-                                           tableOutput("contents")
+                                           tableOutput("Table")
+                                         )
+                                       )
+                                     )
+                            )
+                 ),
+                 navbarMenu("Help",
+                            tabPanel("Absorbance in MeltR", 
+                                     fluidPage(
+                                       sidebarLayout(
+                                         sidebarPanel(
+                                         ),
+                                         mainPanel(
+                                           tableOutput("Console")
                                          )
                                        )
                                      )
@@ -28,13 +45,13 @@ ui <- navbarPage("MeltShiny",
                  )
 )      
 
+# Back end
 server <- function(input,output){
   #Reactive list variable 
   values <- reactiveValues(masterFrame=NULL,up=NULL)
   #Upload Project File
   upload <- observeEvent(eventExpr =input$inputFile,
                          handlerExpr = {
-                           req(input$inputFile)
                            #Declaring variables
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
                            req(input$inputFile)
@@ -59,15 +76,14 @@ server <- function(input,output){
                              counter <- counter + 1
                            }
                            values$numReadings <- counter-1
-                           values$masterFrame <- tempFrame
+                           values$masterFrame <- rbind (values$masterFrame, tempFrame)
                            values$up <- 1
-                           #print(values$up)
                          }
   )
-  output$contents <- renderTable({
+  
+  output$Table <- renderTable({
     return(values$masterFrame)})
 }
- 
  
 # Run the app
 shinyApp(ui = ui, server = server)
