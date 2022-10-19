@@ -6,7 +6,7 @@ library(shiny)
 library(glue)
 
 # Define UI ----
-ui <- navbarPage(title = "MeltShiny",
+ui <- navbarPage(title = "MeltShiny",id = "navbar",
                  navbarMenu("File",
                             tabPanel("Add Data", 
                                      fluidPage(
@@ -25,12 +25,16 @@ ui <- navbarPage(title = "MeltShiny",
                                          )
                                        )
                                      )
-                            )
-                 ),tabPanel("Data Visualization",
+                            ),
+                 ),navbarMenu("Plots",NULL),
+                 tabPanel("Data Visualization",
                    sidebarLayout(
                      sidebarPanel(
                        width = 3,
-                       h2(align="center","Data Visualization")
+                       h2(align="center","Data Visualization"),
+                       strong("Check Which Plots to View"),
+                       uiOutput("checkboxes"),
+                       actionButton("automate","Automate Fitting Data")
                      ),mainPanel(
                        uiOutput("dataVisualContents"),
                      )
@@ -42,7 +46,7 @@ ui <- navbarPage(title = "MeltShiny",
 
 server <- function(input,output){
   #Reactive list variable 
-  values <- reactiveValues(masterFrame=NULL)
+  values <- reactiveValues(masterFrame=NULL,numReadings=NULL)
   #Upload Project File
   observeEvent(eventExpr =input$inputFile,
                handlerExpr = {
@@ -73,11 +77,39 @@ server <- function(input,output){
                  }
                  values$numReadings <- counter-1
                  values$masterFrame <- tempFrame
+                 values$uploaded <- 1
                }
   )
   
   output$contents <- renderTable({
     return(values$masterFrame)})
+  
+  #code that hides "Plots" drop-down hidden until file successfully uploads
+  observeEvent(
+    eventExpr = is.null(values$numReadings),
+    handlerExpr = {
+      hideTab(inputId = "navbar",target="Plots")
+    }
+  )
+  
+  
+  #code that creates n elements for the "Plots" drop-down menu
+  observe({
+    req(values$numReadings)
+    lapply(1:values$numReadings,function(i){
+      tabName = paste0("Plot ",i)
+      appendTab(inputId="navbar",
+                tab=tabPanel(
+                  tabName,
+                  #Page Creation Starts Under Here
+                  paste(tabName,"page")
+                  #Page Creation Ends above Here
+                ),
+                menuName = "Plots")
+    })
+    showTab(inputId = "navbar",target = "Plots")
+  })
+  
   
   #Dynamically creates a renderPlot object of each absorbance readings
   observe({
@@ -152,6 +184,17 @@ server <- function(input,output){
         }
       }
     })
+  })
+  
+  #Dynamically output # of check boxes
+  output$checkboxes <- renderUI({
+    req(input$inputFile)
+    boxOutput = lapply(1:values$numReadings, function(i){
+      plotName = paste0("plot",i)
+      plotBox = paste0("plotBox",i)
+      checkboxInput(plotBox,plotName,value=TRUE)
+    })
+    do.call(tagList,boxOutput)
   })
 }
 # Run the app
