@@ -5,9 +5,18 @@ library(ggplot2)
 library(shiny)
 library(glue)
 
-# Define UI ----
+
+
+counter <- 1
+
+# The UI consists of a navbar page, with a single drop down menu, "File" , which contains a single option "Add data".
+
 ui <- navbarPage(title = "MeltShiny",id = "navbar",
                  navbarMenu("File",
+                            # When the user clicks the "Add Data" tab panel, a fluid page is created below the nav bar.
+                            # This page contains a side bar panel and a main panel.
+                            # The side bar contains the given options a user has when they click one of the options in the nav bar.
+                            # The main panel contains the graphs or tables.
                             tabPanel("Add Data", 
                                      fluidPage(
                                        sidebarLayout(
@@ -21,7 +30,20 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                                      accept = ".csv")
                                          ),
                                          mainPanel(
-                                           tableOutput("contents")
+                                           tableOutput("Table")
+                                         )
+                                       )
+                                     )
+                            )
+                 ),
+                 navbarMenu("Help",
+                            tabPanel("Absorbance in MeltR", 
+                                     fluidPage(
+                                       sidebarLayout(
+                                         sidebarPanel(
+                                         ),
+                                         mainPanel(
+                                           tableOutput("Console")
                                          )
                                        )
                                      )
@@ -42,46 +64,47 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
               
              
                  )
-)      
+) 
 
-server <- function(input,output){
+# Back end
+server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame=NULL,numReadings=NULL)
   #Upload Project File
-  observeEvent(eventExpr =input$inputFile,
-               handlerExpr = {
-                 req(input$inputFile)
-                 #Declaring variables
-                 pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
-                 req(input$inputFile)
-                 fileName = input$inputFile$datapath
-                 cd <- read.csv(file = fileName,header=FALSE)
-                 df <- cd %>% select_if(~ !any(is.na(.)))
-                 #Creating temporary frame to store sample data
-                 columns <- c("Sample", "Pathlength", "Temperature", "Absorbance")
-                 tempFrame <- data.frame(matrix(nrow = 0, ncol = 4))
-                 colnames(tempFrame) <- columns
-                 readings <- ncol(df)
-                 #Loop that appends sample data 
-                 counter <- 1
-                 for (x in 2:readings){
-                   x <- x
-                   col <- df[x]
-                   sample<-rep(c(counter),times=nrow(df[x]))
-                   pathlength<-rep(c(pathlengths[counter]),times=nrow(df[x]))
-                   col <- df[x]
-                   t <- data.frame(sample,pathlength,df[1],df[x])
-                   names(t) <- names(tempFrame)
-                   tempFrame <- rbind(tempFrame, t)
-                   counter <- counter + 1
-                 }
-                 values$numReadings <- counter-1
-                 values$masterFrame <- tempFrame
-                 values$uploaded <- 1
-               }
+
+  upload <- observeEvent(eventExpr =input$inputFile,
+                         handlerExpr = {
+                           # Declaring variables
+                           pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
+                           req(input$inputFile)
+                           fileName = input$inputFile$datapath
+                           cd <- read.csv(file = fileName,header=FALSE)
+                           df <- cd %>% select_if(~ !any(is.na(.)))
+                           # Creating temporary frame to store sample data
+                           columns <- c("Sample", "Pathlength", "Temperature", "Absorbance")
+                           tempFrame <- data.frame(matrix(nrow = 0, ncol = 4))
+                           colnames(tempFrame) <- columns
+                           readings <- ncol(df)
+                           # Loop that appends sample data 
+                           p <-1
+                           for (x in 2:readings){
+                             col <- df[x]
+                             sample<-rep(c(counter),times=nrow(df[x]))
+                             pathlength<-rep(c(pathlengths[p]),times=nrow(df[x]))
+                             col <- df[x]
+                             t <- data.frame(sample,pathlength,df[1],df[x])
+                             names(t) <- names(tempFrame)
+                             tempFrame <- rbind(tempFrame, t)
+                             p <- p + 1
+                             counter <<- counter + 1
+                           }
+                           values$numReadings <- counter-1
+                           values$masterFrame <- rbind (values$masterFrame, tempFrame)
+                           values$uploaded <- 1
+                         }
+
   )
-  
-  output$contents <- renderTable({
+  output$Table <- renderTable({
     return(values$masterFrame)})
   
   #code that hides "Plots" drop-down hidden until file successfully uploads
@@ -197,5 +220,8 @@ server <- function(input,output){
     do.call(tagList,boxOutput)
   })
 }
+
+ 
+
 # Run the app
 shinyApp(ui = ui, server = server)
