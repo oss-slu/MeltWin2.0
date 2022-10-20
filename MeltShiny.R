@@ -43,7 +43,7 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                          sidebarPanel(
                                          ),
                                          mainPanel(
-                                           tableOutput("Console")
+                                           #tableOutput("Console")
                                          )
                                        )
                                      )
@@ -149,7 +149,8 @@ server <- function(input,output, session){
                            color = factor(Sample))) +
             geom_point() +theme_classic() +
             geom_vline(xintercept = input[[plotSlider]][1]) +
-            geom_vline(xintercept = input[[plotSlider]][2])
+            geom_vline(xintercept = input[[plotSlider]][2])+
+            theme(legend.position = "none")
         })
       })
     }
@@ -170,7 +171,7 @@ server <- function(input,output, session){
       xmax = max(data$Temperature)
       #even # of plots
       if(values$numReadings%%2 == 0){
-        if(i%%2 !=0){
+        if(i%%2 !=0 & checkboxInput==TRUE){
           div(
             fluidRow(
               column(6,plotOutput(plotName)),
