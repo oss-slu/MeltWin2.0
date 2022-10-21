@@ -43,12 +43,12 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                          sidebarPanel(
                                          ),
                                          mainPanel(
-                                           tableOutput("Console")
+                                           #tableOutput("Console")
                                          )
                                        )
                                      )
                             ),
-                 ),navbarMenu("Plots",NULL),
+                 ),navbarMenu("Analysis",NULL),
                  tabPanel("Data Visualization",
                    sidebarLayout(
                      sidebarPanel(
@@ -111,26 +111,49 @@ server <- function(input,output, session){
   observeEvent(
     eventExpr = is.null(values$numReadings),
     handlerExpr = {
-      hideTab(inputId = "navbar",target="Plots")
+      hideTab(inputId = "navbar",target="Analysis")
     }
   )
   
   
   #code that creates n elements for the "Plots" drop-down menu
-  observe({
-    req(values$numReadings)
+  observeEvent(values$numReadings, {
+    #req(values$numReadings)
     lapply(1:values$numReadings,function(i){
-      tabName = paste0("Plot ",i)
+      tabName = paste("Sample",i,sep=" ")
+      plotName = paste0("plot",i)
+      plotSlider <- paste0("plotSlider",i)
+      data = values$masterFrame[values$masterFrame$Sample == i,]
+      xmin = min(data$Temperature)
+      xmax = max(data$Temperature)
+      derivative = paste0("derivative",i)
+      fitData = paste0("fit",i)
+      fitIterations = paste0("fitIteration",i)
       appendTab(inputId="navbar",
                 tab=tabPanel(
                   tabName,
-                  #Page Creation Starts Under Here
-                  paste(tabName,"page")
-                  #Page Creation Ends above Here
+                  #Page creation for each sample 
+                  fluidPage(
+                    sidebarLayout(
+                      sidebarPanel(
+                        #side-panel code
+                        h2("Features"),
+                        checkboxInput(inputId=derivative,"First Derivative",value=FALSE),
+                        hr(),
+                        textInput(fitIterations,"Enter the number of combitions to test for fitting.",value=100),
+                        actionButton(fitData,"Fit Data")
+                      ),mainPanel(
+                        #main-panel code
+                        plotOutput(plotName),
+                        column(6,sliderInput(plotSlider,glue("Plot{i}: Range of values"),min=xmin,max=xmax,value=c(xmin,xmax)))
+                      )
+                    )
+                  )
+                  #Page creation for each sample ends here
                 ),
-                menuName = "Plots")
+                menuName = "Analysis")
     })
-    showTab(inputId = "navbar",target = "Plots")
+    showTab(inputId = "navbar",target = "Analysis")
   })
   
   
