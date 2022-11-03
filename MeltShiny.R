@@ -155,6 +155,7 @@ server <- function(input,output, session){
   #Output Structure: two plots & sliders per column
   output$dataVisualContents <- renderUI({
     req(input$inputFile)
+    
   })
   
   #Dynamically output # of check boxes
