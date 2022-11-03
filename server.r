@@ -54,13 +54,9 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                  navbarMenu("Results",
                             tabPanel("Vant Hoff Plots", 
                                      fluidPage(
-                                       sidebarLayout(
-                                         sidebarPanel(
-                                         ),
                                          mainPanel(
                                            tableOutput("dataVisualContents")
                                          )
-                                       )
                                      )
                             ),
                  ),navbarMenu("Plots",NULL)
@@ -165,6 +161,7 @@ server <- function(input,output, session){
   #Output Structure: two plots & sliders per column
   output$dataVisualContents <- renderUI({
     req(input$inputFile)
+<<<<<<< HEAD:server.r
     lapply(1:values$numReadings, function(i){
       plotSlider <- paste0("plotSlider",i)
       plotName <- paste0("plot",i)
@@ -212,6 +209,8 @@ server <- function(input,output, session){
         }
       }
     })
+=======
+>>>>>>> df0b749 (removing unnecessary pannels):MeltShiny.R
   })
   
   #Dynamically output # of check boxes
