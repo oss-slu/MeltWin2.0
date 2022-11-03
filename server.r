@@ -158,6 +158,7 @@ server <- function(input,output, session){
   output$dataVisualContents <- renderUI({
     req(input$inputFile)
 <<<<<<< HEAD:server.r
+<<<<<<< HEAD:server.r
     lapply(1:values$numReadings, function(i){
       plotSlider <- paste0("plotSlider",i)
       plotName <- paste0("plot",i)
@@ -207,6 +208,9 @@ server <- function(input,output, session){
     })
 =======
 >>>>>>> df0b749 (removing unnecessary pannels):MeltShiny.R
+=======
+    
+>>>>>>> c59c7d0 (removing unnecessary pannels):MeltShiny.R
   })
   
   #Dynamically output # of check boxes
