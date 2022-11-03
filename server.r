@@ -1,89 +1,21 @@
-library(dplyr, warn.conflicts = FALSE)
-library(ggplot2)
-library(glue)
-library(MeltR)
-library(shiny)
-
-
-
-
-counter <- 1
-start = 1
-# The UI consists of a navbar page, with a single drop down menu, "File" , which contains a single option "Add data".
-
-ui <- navbarPage(title = "MeltShiny",id = "navbar",
-                 navbarMenu("File",
-                            # When the user clicks the "Add Data" tab panel, a fluid page is created below the nav bar.
-                            # This page contains a side bar panel and a main panel.
-                            # The side bar contains the given options a user has when they click one of the options in the nav bar.
-                            # The main panel contains the graphs or tables.
-                            tabPanel("Add Data", 
-                                     fluidPage(
-                                       sidebarLayout(
-                                         sidebarPanel(
-                                           textInput(label = "Enter the Pathlength for each Absorbance Reading(separated by commas)",
-                                                     placeholder = "E.g: 2,5,3,2,...",
-                                                     inputId = "pathlengths"),
-                                           fileInput(label = "Add Data",
-                                                     inputId = "inputFile",
-                                                     multiple = FALSE,
-                                                     accept = ".csv")
-                                         ),
-                                         mainPanel(
-                                           tableOutput("Table")
-                                         )
-                                       )
-                                     )
-                            )
-                 ),
-                 navbarMenu("Help",
-                            tabPanel("Absorbance in MeltR", 
-                                     fluidPage(
-                                       sidebarLayout(
-                                         sidebarPanel(
-                                         ),
-                                         mainPanel(
-                                           tableOutput("Console")
-                                         )
-                                       )
-                                     )
-                            ),
-                 ),navbarMenu("Plots",NULL),
-                 tabPanel("Data Visualization",
-                   sidebarLayout(
-                     sidebarPanel(
-                       width = 3,
-                       h2(align = "center","Data Visualization"),
-                       strong("Check Which Plots to View"),
-                       uiOutput("checkboxes"),
-                       actionButton("automate","Automate Fitting Data")
-                     ),mainPanel(
-                       uiOutput("dataVisualContents"),
-                     )
-                   )
-              
-             
-                 )
-) 
-
 # Back end
 server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
   #Upload Project File
-
+  
   upload <- observeEvent(eventExpr = input$inputFile,
                          handlerExpr = {
                            # Declaring variables
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
                            req(input$inputFile)
-                           fileName = input$inputFile$datapath
+                           fileName <- input$inputFile$datapath
                            cd <- read.csv(file = fileName,header = FALSE)
                            df <- cd %>% select_if(~ !any(is.na(.)))
                            # Creating temporary frame to store sample data
                            columns <- c("Sample", "Pathlength", "Temperature", "Absorbance")
                            tempFrame <- data.frame(matrix(nrow = 0, ncol = 4))
-                           colnames(tempFrame) <- columns
+                           colnames(tempFrame) <-columns
                            readings <- ncol(df)
                            # Loop that appends sample data 
                            p <- 1
@@ -102,7 +34,7 @@ server <- function(input,output, session){
                            values$masterFrame <- rbind(values$masterFrame, tempFrame)
                            values$uploaded <- 1
                          }
-
+                         
   )
   output$Table <- renderTable({
     return(values$masterFrame)})
@@ -120,7 +52,7 @@ server <- function(input,output, session){
   observe({
     req(values$numReadings)
     lapply(start:values$numReadings,function(i){
-      tabName = paste0("Plot ",i)
+      tabName <- paste0("Plot ",i)
       appendTab(inputId = "navbar",
                 tab = tabPanel(
                   tabName,
@@ -164,11 +96,11 @@ server <- function(input,output, session){
     lapply(1:values$numReadings, function(i){
       plotSlider <- paste0("plotSlider",i)
       plotName <- paste0("plot",i)
-      nextPlot = paste0("plot",i + 1)
+      nextPlot <- paste0("plot",i + 1)
       nextSlider = paste0("plotSlider",i + 1)
-      data = values$masterFrame[values$masterFrame$Sample == i,]
-      xmin = min(data$Temperature)
-      xmax = max(data$Temperature)
+      data <- values$masterFrame[values$masterFrame$Sample == i,]
+      xmin <- min(data$Temperature)
+      xmax <- max(data$Temperature)
       #even # of plots
       if (values$numReadings %% 2 == 0) {
         if (i %% 2 != 0) {
@@ -184,7 +116,7 @@ server <- function(input,output, session){
             hr()
           )
         }
-      #odd # of plots
+        #odd # of plots
       }else{
         if (i == values$numReadings) {
           tagList(
@@ -213,16 +145,16 @@ server <- function(input,output, session){
   #Dynamically output # of check boxes
   output$checkboxes <- renderUI({
     req(input$inputFile)
-    boxOutput = lapply(1:values$numReadings, function(i){
-      plotName = paste0("plot",i)
-      plotBox = paste0("plotBox",i)
+    boxOutput <- lapply(1:values$numReadings, function(i){
+      plotName <- paste0("plot",i)
+      plotBox <- paste0("plotBox",i)
       checkboxInput(plotBox,plotName,value = TRUE)
     })
     do.call(tagList,boxOutput)
   })
 }
 
- 
+
 
 # Run the app
-shinyApp(ui = ui, server = server)
+#shinyApp(ui = ui, server = server)
