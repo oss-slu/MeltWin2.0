@@ -9,13 +9,13 @@ server <- function(input,output, session){
                            # Declaring variables
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
                            req(input$inputFile)
-                           fileName = input$inputFile$datapath
+                           fileName <- input$inputFile$datapath
                            cd <- read.csv(file = fileName,header = FALSE)
                            df <- cd %>% select_if(~ !any(is.na(.)))
                            # Creating temporary frame to store sample data
                            columns <- c("Sample", "Pathlength", "Temperature", "Absorbance")
                            tempFrame <- data.frame(matrix(nrow = 0, ncol = 4))
-                           colnames(tempFrame) <- columns
+                           colnames(tempFrame) <-columns
                            readings <- ncol(df)
                            # Loop that appends sample data 
                            p <- 1
@@ -52,7 +52,7 @@ server <- function(input,output, session){
   observe({
     req(values$numReadings)
     lapply(start:values$numReadings,function(i){
-      tabName = paste0("Plot ",i)
+      tabName <- paste0("Plot ",i)
       appendTab(inputId = "navbar",
                 tab = tabPanel(
                   tabName,
@@ -96,11 +96,11 @@ server <- function(input,output, session){
     lapply(1:values$numReadings, function(i){
       plotSlider <- paste0("plotSlider",i)
       plotName <- paste0("plot",i)
-      nextPlot = paste0("plot",i + 1)
+      nextPlot <- paste0("plot",i + 1)
       nextSlider = paste0("plotSlider",i + 1)
-      data = values$masterFrame[values$masterFrame$Sample == i,]
-      xmin = min(data$Temperature)
-      xmax = max(data$Temperature)
+      data <- values$masterFrame[values$masterFrame$Sample == i,]
+      xmin <- min(data$Temperature)
+      xmax <- max(data$Temperature)
       #even # of plots
       if (values$numReadings %% 2 == 0) {
         if (i %% 2 != 0) {
@@ -145,9 +145,9 @@ server <- function(input,output, session){
   #Dynamically output # of check boxes
   output$checkboxes <- renderUI({
     req(input$inputFile)
-    boxOutput = lapply(1:values$numReadings, function(i){
-      plotName = paste0("plot",i)
-      plotBox = paste0("plotBox",i)
+    boxOutput <- lapply(1:values$numReadings, function(i){
+      plotName <- paste0("plot",i)
+      plotBox <- paste0("plotBox",i)
       checkboxInput(plotBox,plotName,value = TRUE)
     })
     do.call(tagList,boxOutput)
