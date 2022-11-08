@@ -43,27 +43,26 @@ server <- function(input,output, session){
   observeEvent(
     eventExpr = is.null(values$numReadings),
     handlerExpr = {
-      hideTab(inputId = "navbar",target = "Plots")
+      hideTab(inputId = "navbar",target = "Analysis")
     }
   )
   
   
-  #code that creates n elements for the "Plots" drop-down menu
+  #code that creates n tabPanels for the "Analysis" tabPanel
   observe({
     req(values$numReadings)
     lapply(start:values$numReadings,function(i){
       tabName <- paste0("Plot ",i)
-      appendTab(inputId = "navbar",
+      appendTab(inputId = "tabs",
                 tab = tabPanel(
                   tabName,
                   #Page Creation Starts Under Here
                   paste(tabName,"page")
                   #Page Creation Ends above Here
-                ),
-                menuName = "Plots")
+                ))
     })
     start <<- values$numReadings + 1
-    showTab(inputId = "navbar",target = "Plots")
+    showTab(inputId = "navbar",target = "Analysis")
   })
   
   

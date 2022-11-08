@@ -43,7 +43,8 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                        )
                                      )
                             ),
-                 ),navbarMenu("Plots",NULL),
+                 ),tabPanel("Analysis",
+                            tabsetPanel(id = "tabs")),
                  tabPanel("Data Visualization",
                           sidebarLayout(
                             sidebarPanel(
