@@ -1,69 +1,3 @@
-<<<<<<< HEAD:server.r
-=======
-library(dplyr, warn.conflicts = FALSE)
-library(ggplot2)
-library(glue)
-library(MeltR)
-library(shiny)
-
-
-
-
-counter <- 1
-start = 1
-# The UI consists of a navbar page, with a single drop down menu, "File" , which contains a single option "Add data".
-
-ui <- navbarPage(title = "MeltShiny",id = "navbar",
-                 navbarMenu("File",
-                            # When the user clicks the "Add Data" tab panel, a fluid page is created below the nav bar.
-                            # This page contains a side bar panel and a main panel.
-                            # The side bar contains the given options a user has when they click one of the options in the nav bar.
-                            # The main panel contains the graphs or tables.
-                            tabPanel("Add Data", 
-                                     fluidPage(
-                                       sidebarLayout(
-                                         sidebarPanel(
-                                           textInput(label = "Enter the Pathlength for each Absorbance Reading(separated by commas)",
-                                                     placeholder = "E.g: 2,5,3,2,...",
-                                                     inputId = "pathlengths"),
-                                           fileInput(label = "Add Data",
-                                                     inputId = "inputFile",
-                                                     multiple = FALSE,
-                                                     accept = ".csv")
-                                         ),
-                                         mainPanel(
-                                           tableOutput("Table")
-                                         )
-                                       )
-                                     )
-                            )
-                 ),
-                 navbarMenu("Help",
-                            tabPanel("Absorbance in MeltR", 
-                                     fluidPage(
-                                       sidebarLayout(
-                                         sidebarPanel(
-                                         ),
-                                         mainPanel(
-                                           tableOutput("Console")
-                                         )
-                                       )
-                                     )
-                            ),
-                 ),
-                 navbarMenu("Results",
-                            tabPanel("Vant Hoff Plots", 
-                                     fluidPage(
-                                         mainPanel(
-                                           tableOutput("dataVisualContents")
-                                         )
-                                     )
-                            ),
-                 ),navbarMenu("Plots",NULL)
-) 
-
->>>>>>> 544f60b (added new panel):MeltShiny.R
-# Back end
 server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
@@ -157,8 +91,6 @@ server <- function(input,output, session){
   #Output Structure: two plots & sliders per column
   output$dataVisualContents <- renderUI({
     req(input$inputFile)
-<<<<<<< HEAD:server.r
-<<<<<<< HEAD:server.r
     lapply(1:values$numReadings, function(i){
       plotSlider <- paste0("plotSlider",i)
       plotName <- paste0("plot",i)
@@ -206,11 +138,6 @@ server <- function(input,output, session){
         }
       }
     })
-=======
->>>>>>> df0b749 (removing unnecessary pannels):MeltShiny.R
-=======
-    
->>>>>>> c59c7d0 (removing unnecessary pannels):MeltShiny.R
   })
   
   #Dynamically output # of check boxes
