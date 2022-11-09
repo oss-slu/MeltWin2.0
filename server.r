@@ -52,13 +52,36 @@ server <- function(input,output, session){
   observe({
     req(values$numReadings)
     lapply(start:values$numReadings,function(i){
-      tabName <- paste0("Plot ",i)
+      tabName = paste("Sample",i,sep=" ")
+      plotName = paste0("plot",i)
+      plotSlider <- paste0("plotSlider",i)
+      data = values$masterFrame[values$masterFrame$Sample == i,]
+      xmin = min(data$Temperature)
+      xmax = max(data$Temperature)
+      plotDerivative = paste0("plotDerivative",i)
+      fitData = paste0("fit",i)
+      firstDerivative = paste0("firstDerivative",i)
+      fitIterations = paste0("fitIteration",i)
+      checkbox = paste0("checkbox",i)
       appendTab(inputId = "tabs",
                 tab = tabPanel(
                   tabName,
-                  #Page Creation Starts Under Here
-                  paste(tabName,"page")
-                  #Page Creation Ends above Here
+                  fluidPage(
+                    sidebarLayout(
+                      sidebarPanel(
+                        #side-panel code
+                        h2("Features"),
+                        checkboxInput(inputId=firstDerivative,label="First Derivative"),
+                        hr(),
+                        textInput(fitIterations,"Enter the number of combitions to test for fitting.",value=100),
+                        actionButton(fitData,"Fit Data")
+                      ),mainPanel(
+                        #main-panel code
+                        plotOutput(plotName),
+                        column(6,sliderInput(plotSlider,glue("Plot{i}: Range of values"),min=xmin,max=xmax,value=c(xmin,xmax)))
+                      )
+                    )
+                  )
                 ))
     })
     start <<- values$numReadings + 1
