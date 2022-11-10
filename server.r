@@ -56,13 +56,12 @@ server <- function(input,output, session){
       plotName = paste0("plot",i)
       plotSlider <- paste0("plotSlider",i)
       data = values$masterFrame[values$masterFrame$Sample == i,]
-      xmin = min(data$Temperature)
-      xmax = max(data$Temperature)
+      xmin = round(min(data$Temperature),1)
+      xmax = round(max(data$Temperature),1)
       plotDerivative = paste0("plotDerivative",i)
       fitData = paste0("fit",i)
       firstDerivative = paste0("firstDerivative",i)
       fitIterations = paste0("fitIteration",i)
-      checkbox = paste0("checkbox",i)
       appendTab(inputId = "tabs",
                 tab = tabPanel(
                   tabName,
@@ -77,8 +76,22 @@ server <- function(input,output, session){
                         actionButton(fitData,"Fit Data")
                       ),mainPanel(
                         #main-panel code
-                        plotOutput(plotName),
-                        column(6,sliderInput(plotSlider,glue("Plot{i}: Range of values"),min=xmin,max=xmax,value=c(xmin,xmax)))
+                        conditionalPanel(
+                          condition = glue("!input.{firstDerivative}"),
+                          plotOutput(plotName)
+                        ),
+                        conditionalPanel(
+                          condition = glue("input.{firstDerivative}"),
+                          plotOutput(plotDerivative)
+                        ),
+                        sliderInput(plotSlider,
+                                    glue("Plot{i}: Range of values"),
+                                    min=xmin,
+                                    max=xmax,
+                                    value=c(xmin,xmax),
+                                    round=TRUE,
+                                    step=.10,
+                                    width="85%")
                       )
                     )
                   )
@@ -87,7 +100,6 @@ server <- function(input,output, session){
     start <<- values$numReadings + 1
     showTab(inputId = "navbar",target = "Analysis")
   })
-  
   
   #Dynamically creates a renderPlot object of each absorbance readings
   observe({
@@ -103,8 +115,24 @@ server <- function(input,output, session){
                            y = Absorbance, 
                            color = factor(Sample))) +
             geom_point() + theme_classic() +
+            ylim(min(data$Absorbance),max(data$Absorbance)+1) +
             geom_vline(xintercept = input[[plotSlider]][1]) +
             geom_vline(xintercept = input[[plotSlider]][2])
+        })
+        plotDerivative = paste0("plotDerivative",myI)
+        output[[plotDerivative]] <- renderPlot({
+          data = values$masterFrame[values$masterFrame$Sample == myI,]
+          data %>%
+            arrange(Temperature) %>%
+            mutate(slope = (Absorbance - lag(Absorbance))/
+                     (Temperature - lag(Temperature))) %>%
+            ggplot(aes(Temperature)) +
+            geom_line(aes(y= Absorbance, color = "Absorbance"), size = 1.2) +
+            geom_smooth(aes(y= slope * 20 + 1.4, color = "First Derivative"), se = FALSE, size = 0.8) +
+            ylim(min(data$Absorbance),max(data$Absorbance)+1) +
+            geom_vline(xintercept = input[[plotSlider]][1]) +
+            geom_vline(xintercept = input[[plotSlider]][2])
+          #scale_y_continuous(sec.axis = sec_axis(trans = ~(.x - 1.4)/20, name = "slope"))
         })
       })
     }
