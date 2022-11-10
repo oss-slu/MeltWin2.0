@@ -1,3 +1,4 @@
+# Back end
 server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
@@ -14,7 +15,7 @@ server <- function(input,output, session){
                            # Creating temporary frame to store sample data
                            columns <- c("Sample", "Pathlength", "Temperature", "Absorbance")
                            tempFrame <- data.frame(matrix(nrow = 0, ncol = 4))
-                           colnames(tempFrame) <-columns
+                           colnames(tempFrame) <- columns
                            readings <- ncol(df)
                            # Loop that appends sample data 
                            p <- 1
@@ -150,8 +151,35 @@ server <- function(input,output, session){
     })
     do.call(tagList,boxOutput)
   })
-}
+  #output$vantplot <- renderUI({
+  #  req(input$inputFile)
+  #    plotSlider <- paste0("slider")
+  #    plotName <- "vantplot"
+  #    data <- values$masterFrame[values$masterFrame$Sample == 1,]
+  #    xmin <- min(data$Temperature)
+  #    xmax <- max(data$Temperature)
 
+   #       div(
+    #        fluidRow(
+     #         column(6,plotOutput(plotName)),
+      #      ),
+       #     fluidRow(
+        #      column(6,sliderInput(plotSlider,glue("Plotaa: Range of values"),min = xmin,max = xmax,value = c(xmin,xmax))),
+         #   ),
+          #  hr()
+          #)
+  #})
+  output$vantplots <- renderPlot({
+    #req(input$inputFile)
+    #plotSlider <- paste0("slider")
+    #plotName <- "vantplot"
+    data <- values$masterFrame[values$masterFrame$Sample == 1,]
+    #xmin <- min(data$Temperature)
+    #xmax <- max(data$Temperature)
+    plot(data$Temperature,data$Absorbance)
+    
+  }, res = 96)
+}
 
 
 # Run the app
