@@ -15,7 +15,7 @@ server <- function(input,output, session){
                            # Creating temporary frame to store sample data
                            columns <- c("Sample", "Pathlength", "Temperature", "Absorbance")
                            tempFrame <- data.frame(matrix(nrow = 0, ncol = 4))
-                           colnames(tempFrame) <-columns
+                           colnames(tempFrame) <- columns
                            readings <- ncol(df)
                            # Loop that appends sample data 
                            p <- 1
@@ -52,7 +52,7 @@ server <- function(input,output, session){
   observe({
     req(values$numReadings)
     lapply(start:values$numReadings,function(i){
-      tabName = paste("Sample",i,sep=" ")
+      tabName = paste("Sample",i,sep = " ")
       plotName = paste0("plot",i)
       plotFit = paste0("plotFit",i)
       plotBoth = paste0("plotBoth",i)
@@ -73,37 +73,25 @@ server <- function(input,output, session){
                       sidebarPanel(
                         #side-panel code
                         h2("Features"),
-                        checkboxInput(inputId=firstDerivative,label="First Derivative"),
-                        checkboxInput(inputId=bestFit,label="Best Fit"),
-                        hr(),
-                        textInput(fitIterations,"Enter the number of combitions to test for fitting.",value=100),
-                        actionButton(fitData,"Fit Data")
+                        checkboxInput(inputId = firstDerivative,label = "First Derivative")
                       ),mainPanel(
                         #main-panel code
                         conditionalPanel(
-                          condition = glue("!input.{firstDerivative} && !input.{bestFit}"),
+                          condition = glue("!input.{firstDerivative}"),
                           plotOutput(plotName)
                         ),
                         conditionalPanel(
-                          condition = glue("input.{firstDerivative} && !input.{bestFit}"),
+                          condition = glue("input.{firstDerivative}"),
                           plotOutput(plotDerivative)
-                        ),
-                        conditionalPanel(
-                          condition = glue("input.{bestFit} && !input.{firstDerivative}"),
-                          plotOutput(plotFit)
-                        ),
-                        conditionalPanel(
-                          condition = glue("input.{firstDerivative} && input.{bestFit}"),
-                          plotOutput(plotBoth),
                         ),
                         sliderInput(plotSlider,
                                     glue("Plot{i}: Range of values"),
-                                    min=xmin,
-                                    max=xmax,
-                                    value=c(xmin,xmax),
-                                    round=TRUE,
-                                    step=.10,
-                                    width="85%")
+                                    min = xmin,
+                                    max = xmax,
+                                    value = c(xmin,xmax),
+                                    round = TRUE,
+                                    step = .10,
+                                    width = "85%")
                       )
                     )
                   )
@@ -127,7 +115,7 @@ server <- function(input,output, session){
           ggplot(data, aes(x = Temperature, 
                            y = Absorbance)) +
             geom_point() + theme_classic() +
-            ylim(min(data$Absorbance),max(data$Absorbance)+1) +
+            ylim(min(data$Absorbance),max(data$Absorbance) + 1) +
             geom_vline(xintercept = input[[plotSlider]][1]) +
             geom_vline(xintercept = input[[plotSlider]][2])
         })
@@ -137,65 +125,16 @@ server <- function(input,output, session){
           data = values$masterFrame[values$masterFrame$Sample == myI,]
           data %>%
             arrange(Temperature) %>%
-            mutate(slope = (Absorbance - lag(Absorbance))/
+            mutate(slope = (Absorbance - lag(Absorbance)) /
                      (Temperature - lag(Temperature))) %>%
             ggplot(aes(Temperature)) +
-            geom_line(aes(y= Absorbance), size = 1.2) +
-            geom_smooth(aes(y= slope * 20 + 1.4), se = FALSE, size = 0.8) +
-            ylim(min(data$Absorbance),max(data$Absorbance)+1) +
-            theme_classic() +
-            geom_vline(xintercept = input[[plotSlider]][1]) +
-            geom_vline(xintercept = input[[plotSlider]][2])
-          #scale_y_continuous(sec.axis = sec_axis(trans = ~(.x - 1.4)/20, name = "slope"))
-        })
-        #plot containing best fit line with raw data
-        plotFit = paste0("plotFit",myI)
-        output[[plotFit]] = renderPlot({
-          data = values$masterFrame[values$masterFrame$Sample == myI,]
-          fit <- nls(Absorbance ~ SSfpl(Temperature, left, right, midpt, scale),
-                     data = data)
-          fit2 <- nls(Absorbance ~ left+(right-left)/(1+exp((midpt-Temperature)/scale)) 
-                      + (Temperature-midpt)*slope,
-                      start = c(as.list(coef(fit)), slope = 0),
-                      data = data)
-          pred <- data.frame(Temperature = data$Temperature,
-                             Absorbance = predict(fit),
-                             Absorbance2 = predict(fit2))
-          ggplot(data, aes(x = Temperature, y = Absorbance)) +
-            geom_point(color = "red") +
-            #geom_line(data=pred, lwd = 2) +
-            geom_line(data=pred, aes(y=Absorbance2)) +
-            ylim(min(data$Absorbance),max(data$Absorbance)+1) +
+            geom_line(aes(y = Absorbance), size = 1.2) +
+            geom_smooth(aes(y = slope * 20 + 1.4), se = FALSE, size = 0.8) +
             theme_classic() +
             geom_vline(xintercept = input[[plotSlider]][1]) +
             geom_vline(xintercept = input[[plotSlider]][2])
         })
-        #plot containing both first derivative & best fit line with raw data
-        plotBoth = paste0("plotBoth",myI)
-        output[[plotBoth]] = renderPlot({
-          data = values$masterFrame[values$masterFrame$Sample == myI,]
-          fit <- nls(Absorbance ~ SSfpl(Temperature, left, right, midpt, scale),
-                     data = data)
-          fit2 <- nls(Absorbance ~ left+(right-left)/(1+exp((midpt-Temperature)/scale)) 
-                      + (Temperature-midpt)*slope,
-                      start = c(as.list(coef(fit)), slope = 0),
-                      data = data)
-          pred <- data.frame(Temperature = data$Temperature,
-                             Absorbance = predict(fit),
-                             Absorbance2 = predict(fit2))
-          data %>%
-            arrange(Temperature) %>%
-            mutate(slope = (Absorbance - lag(Absorbance))/
-                     (Temperature - lag(Temperature))) %>%
-            ggplot(aes(Temperature)) +
-            geom_line(aes(y= Absorbance), size = 1.2) +
-            geom_smooth(aes(y= slope * 20 + 1.4), se = FALSE, size = 0.8) +
-            geom_line(data=pred, aes(y=Absorbance2),color="red") +
-            ylim(min(data$Absorbance),max(data$Absorbance)+1) +
-            theme_classic() +
-            geom_vline(xintercept = input[[plotSlider]][1]) +
-            geom_vline(xintercept = input[[plotSlider]][2])
-        })
+        
       })
     }
   })
