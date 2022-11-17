@@ -154,8 +154,24 @@ server <- function(input,output, session){
     })
     do.call(tagList,boxOutput)
   })
-}
 
+#  tempFrame <- data.frame(matrix(nrow = 0, ncol = 1))
+#  lapply(1:values$numReadings, function(i){
+#    absorb <- values$masterFrame[values$masterFrame$Sample == i,]
+#    concentration <- log(absorb)
+#    absorbance <- c(absorb)
+#    data <- data.frame(absorb)
+#    tempFrame <- rbind(tempFrame,data)
+#  })
+  
+  #code that plots a van't hoff plot
+  output$vantplots <- renderPlot({
+    data <- values$masterFrame[values$masterFrame$Sample == 1,]
+    Temp <- (1/data$Temperature)
+    plot(data$Absorbance,Temp)
+    
+  }, res = 100)
+}
 
 
 # Run the app
