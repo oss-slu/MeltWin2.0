@@ -8,6 +8,10 @@ server <- function(input,output, session){
                          handlerExpr = {
                            # Declaring variables
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
+                           helix <<- c(unlist(strsplit(input$helixInput,",")))
+                           removeUI(
+                             selector = 
+                           )
                            req(input$inputFile)
                            fileName <- input$inputFile$datapath
                            cd <- read.csv(file = fileName,header = FALSE)
@@ -15,7 +19,7 @@ server <- function(input,output, session){
                            # Creating temporary frame to store sample data
                            columns <- c("Sample", "Pathlength", "Temperature", "Absorbance")
                            tempFrame <- data.frame(matrix(nrow = 0, ncol = 4))
-                           colnames(tempFrame) <-columns
+                           colnames(tempFrame) <- columns
                            readings <- ncol(df)
                            # Loop that appends sample data 
                            p <- 1
