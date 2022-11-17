@@ -151,34 +151,23 @@ server <- function(input,output, session){
     })
     do.call(tagList,boxOutput)
   })
-  #output$vantplot <- renderUI({
-  #  req(input$inputFile)
-  #    plotSlider <- paste0("slider")
-  #    plotName <- "vantplot"
-  #    data <- values$masterFrame[values$masterFrame$Sample == 1,]
-  #    xmin <- min(data$Temperature)
-  #    xmax <- max(data$Temperature)
 
-   #       div(
-    #        fluidRow(
-     #         column(6,plotOutput(plotName)),
-      #      ),
-       #     fluidRow(
-        #      column(6,sliderInput(plotSlider,glue("Plotaa: Range of values"),min = xmin,max = xmax,value = c(xmin,xmax))),
-         #   ),
-          #  hr()
-          #)
-  #})
+#  tempFrame <- data.frame(matrix(nrow = 0, ncol = 1))
+#  lapply(1:values$numReadings, function(i){
+#    absorb <- values$masterFrame[values$masterFrame$Sample == i,]
+#    concentration <- log(absorb)
+#    absorbance <- c(absorb)
+#    data <- data.frame(absorb)
+#    tempFrame <- rbind(tempFrame,data)
+#  })
+  
+  #code that plots a van't hoff plot
   output$vantplots <- renderPlot({
-    #req(input$inputFile)
-    #plotSlider <- paste0("slider")
-    #plotName <- "vantplot"
     data <- values$masterFrame[values$masterFrame$Sample == 1,]
-    #xmin <- min(data$Temperature)
-    #xmax <- max(data$Temperature)
-    plot(data$Temperature,data$Absorbance)
+    Temp <- (1/data$Temperature)
+    plot(data$Absorbance,Temp)
     
-  }, res = 96)
+  }, res = 100)
 }
 
 
