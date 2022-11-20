@@ -8,6 +8,7 @@ server <- function(input,output, session){
                          handlerExpr = {
                            # Declaring variables
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
+                           molStateVal <<- input$molState
                            req(input$inputFile)
                            fileName <- input$inputFile$datapath
                            cd <- read.csv(file = fileName,header = FALSE)
