@@ -60,7 +60,15 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                               uiOutput("dataVisualContents"),
                             )
                           )
-                          
-                          
-                 )
+                 ),
+                 navbarMenu("Results",
+                            tabPanel("Vant Hoff Plots", 
+                                     fluidPage(
+                                         mainPanel(
+                                           plotOutput("vantplots"),
+                                         )
+                                       )
+                                     )
+                            )
+                 
 ) 

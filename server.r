@@ -169,9 +169,9 @@ server <- function(input,output, session){
                     NucAcid = helix,
                     Mmodel = "Heteroduplex.2State")
     caluclations <- data$Method.2.data
-    Temp <- caluclations$invT
-    Concentraion <- caluclations$lnCt
-    plot(Concentraion,Temp)
+    InverseTemp <- caluclations$invT
+    LnConcentraion <- caluclations$lnCt
+    plot(LnConcentraion,InverseTemp)
     
   }, res = 100)
 }
