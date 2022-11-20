@@ -1,3 +1,4 @@
+library(MeltR)
 server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
@@ -8,9 +9,6 @@ server <- function(input,output, session){
                            # Declaring variables
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
                            helix <<- c(unlist(strsplit(input$helixInput,",")))
-                           removeUI(
-                             selector = 
-                           )
                            req(input$inputFile)
                            fileName <- input$inputFile$datapath
                            cd <- read.csv(file = fileName,header = FALSE)
@@ -166,9 +164,14 @@ server <- function(input,output, session){
   
   #code that plots a van't hoff plot
   output$vantplots <- renderPlot({
-    data <- values$masterFrame[values$masterFrame$Sample == 1,]
-    Temp <- (1/data$Temperature)
-    plot(data$Absorbance,Temp)
+    data <- meltR.A(data_frame = df,
+                    blank = 1,
+                    NucAcid = helix,
+                    Mmodel = "Heteroduplex.2State")
+    caluclations <- data$Method.2.data
+    Temp <- caluclations$invT
+    Concentraion <- caluclations$lnCt
+    plot(Concentraion,Temp)
     
   }, res = 100)
 }
