@@ -21,8 +21,8 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                                      inputId = "pathlengths"),
                                            selectInput("molState", 
                                                        "Select the molecular state.(Please note that your selection will apply to all samples, beyond just the ones in the current dataset.)", 
-                                                       choices = c("heteroduplex", "homoduplex","monomolecular"), 
-                                                       selected = "heteroduplex"),
+                                                       choices = c("Heteroduplex", "Homoduplex","Monomolecular"), 
+                                                       selected = "Heteroduplex"),
                                            fileInput(label = "Select the dataset file.",
                                                      inputId = "inputFile",
                                                      multiple = FALSE,
@@ -66,5 +66,16 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                           )
                           
                           
+                 ),
+                 navbarMenu("Results",
+                            tabPanel("Vant Hoff Plots", 
+                                     fluidPage(
+                                       mainPanel(
+                                         plotOutput("vantplots"),
+                                       )
+                                     )
+                            )
                  )
+                 
 ) 
+

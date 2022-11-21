@@ -1,3 +1,4 @@
+# Back end
 server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
@@ -154,6 +155,19 @@ server <- function(input,output, session){
     })
     do.call(tagList,boxOutput)
   })
+  #code that plots a van't hoff plot
+  output$vantplots <- renderPlot({
+    Model <- paste(molStateVal,".2State", sep = "")
+    data <- meltR.A(data_frame = df,
+                    blank = 1,
+                    NucAcid = helix,
+                    Mmodel = Model)
+    caluclations <- data$Method.2.data
+    InverseTemp <- caluclations$invT
+    LnConcentraion <- caluclations$lnCt
+    plot(LnConcentraion,InverseTemp)
+    
+  }, res = 100)
 }
 
 
