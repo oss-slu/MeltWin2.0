@@ -13,6 +13,8 @@ server <- function(input,output, session){
                            req(input$inputFile)
                            removeUI(
                              selector = "div:has(> #helixInput)"
+                           )
+                           removeUI(
                              selector = "div:has(>> #molState)"
                            )
                            fileName <- input$inputFile$datapath
