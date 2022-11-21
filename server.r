@@ -1,4 +1,4 @@
-# Back end
+library(MeltR)
 server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
@@ -155,6 +155,7 @@ server <- function(input,output, session){
     })
     do.call(tagList,boxOutput)
   })
+
   #code that plots a van't hoff plot
   output$vantplots <- renderPlot({
     Model <- paste(molStateVal,".2State", sep = "")
@@ -169,7 +170,6 @@ server <- function(input,output, session){
     
   }, res = 100)
 }
-
 
 
 # Run the app
