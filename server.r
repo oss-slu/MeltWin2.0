@@ -1,4 +1,4 @@
-library(MeltR)
+library(MeltR) #Needs to be removed when Anothy pushes code
 server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
