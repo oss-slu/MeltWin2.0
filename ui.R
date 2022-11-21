@@ -26,7 +26,10 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                            fileInput(label = "Select the dataset file.",
                                                      inputId = "inputFile",
                                                      multiple = FALSE,
-                                                     accept = ".csv")
+                                                     accept = ".csv"),
+                                           textInput(label = "Enter the sequence information in the following order: Nucleic Acid, A sequence, and its complement)",
+                                                     placeholder = "E.g: RNA,CGAAAGGU,ACCUUUCG",
+                                                     inputId = "helixInput")
                                          ),
                                          mainPanel(
                                            tableOutput("Table")
@@ -42,7 +45,7 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                          sidebarPanel(
                                          ),
                                          mainPanel(
-                                           tableOutput("Console")
+                                           #tableOutput("Console")
                                          )
                                        )
                                      )

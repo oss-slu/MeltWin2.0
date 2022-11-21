@@ -9,6 +9,7 @@ server <- function(input,output, session){
                            # Declaring variables
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
                            molStateVal <<- input$molState
+                           helix <<- c(unlist(strsplit(input$helixInput,",")))
                            req(input$inputFile)
                            removeUI(
                              selector = "div:has(>> #molState)"
@@ -19,7 +20,7 @@ server <- function(input,output, session){
                            # Creating temporary frame to store sample data
                            columns <- c("Sample", "Pathlength", "Temperature", "Absorbance")
                            tempFrame <- data.frame(matrix(nrow = 0, ncol = 4))
-                           colnames(tempFrame) <-columns
+                           colnames(tempFrame) <- columns
                            readings <- ncol(df)
                            # Loop that appends sample data 
                            p <- 1
