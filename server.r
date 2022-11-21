@@ -9,10 +9,10 @@ server <- function(input,output, session){
                            # Declaring variables
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
                            helix <<- c(unlist(strsplit(input$helixInput,",")))
-                           #removeUI(
-                           # selector = 
-                           #)
                            req(input$inputFile)
+                           removeUI(
+                             selector = "div:has(> #helixInput)"
+                           )
                            fileName <- input$inputFile$datapath
                            cd <- read.csv(file = fileName,header = FALSE)
                            df <- cd %>% select_if(~ !any(is.na(.)))

@@ -19,13 +19,13 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                            textInput(label = "Enter the Pathlength for each Absorbance Reading(separated by commas)",
                                                      placeholder = "E.g: 2,5,3,2,...",
                                                      inputId = "pathlengths"),
+                                           textInput(label = "Enter the sequence information in the following order: Nucleic Acid, A sequence, and its complement)",
+                                                     placeholder = "E.g: RNA,CGAAAGGU,ACCUUUCG",
+                                                     inputId = "helixInput"),
                                            fileInput(label = "Add Data",
                                                      inputId = "inputFile",
                                                      multiple = FALSE,
-                                                     accept = ".csv"),
-                                           textInput(label = "Enter the sequence information in the following order: Nucleic Acid, A sequence, and its complement)",
-                                                     placeholder = "E.g: RNA,CGAAAGGU,ACCUUUCG",
-                                                     inputId = "helixInput")
+                                                     accept = ".csv")
                                          ),
                                          mainPanel(
                                            tableOutput("Table")
