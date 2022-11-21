@@ -19,17 +19,17 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                            textInput(label = "Enter the Pathlength for each absorbance reading. (Note, they should be separated by commas and have no spaces inbetween.)",
                                                      placeholder = "E.g: 2,5,3,2,...",
                                                      inputId = "pathlengths"),
+                                           textInput(label = "Enter the sequence information in the following order: Nucleic Acid, A sequence, and its complement)",
+                                                     placeholder = "E.g: RNA,CGAAAGGU,ACCUUUCG",
+                                                     inputId = "helixInput"),
                                            selectInput("molState", 
                                                        "Select the molecular state.(Please note that your selection will apply to all samples, beyond just the ones in the current dataset.)", 
                                                        choices = c("Heteroduplex", "Homoduplex","Monomolecular"), 
                                                        selected = "Heteroduplex"),
-                                           fileInput(label = "Select the dataset file.",
+                                           fileInput(label = "Select the dataset file.",                                        
                                                      inputId = "inputFile",
                                                      multiple = FALSE,
-                                                     accept = ".csv"),
-                                           textInput(label = "Enter the sequence information in the following order: Nucleic Acid, A sequence, and its complement)",
-                                                     placeholder = "E.g: RNA,CGAAAGGU,ACCUUUCG",
-                                                     inputId = "helixInput")
+                                                     accept = ".csv")
                                          ),
                                          mainPanel(
                                            tableOutput("Table")
@@ -75,4 +75,3 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                      )
                             )
 ) 
-
