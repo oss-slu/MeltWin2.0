@@ -2,14 +2,17 @@
 server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
-  #Upload Project File
   
+  #Upload Project File
   upload <- observeEvent(eventExpr = input$inputFile,
                          handlerExpr = {
                            # Declaring variables
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
                            molStateVal <<- input$molState
                            req(input$inputFile)
+                           removeUI(
+                             selector = "div:has(>> #molState)"
+                           )
                            fileName <- input$inputFile$datapath
                            cd <- read.csv(file = fileName,header = FALSE)
                            df <- cd %>% select_if(~ !any(is.na(.)))
@@ -35,7 +38,6 @@ server <- function(input,output, session){
                            values$masterFrame <- rbind(values$masterFrame, tempFrame)
                            values$uploaded <- 1
                          }
-                         
   )
   output$Table <- renderTable({
     return(values$masterFrame)})
