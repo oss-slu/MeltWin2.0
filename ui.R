@@ -1,8 +1,10 @@
 library(dplyr, warn.conflicts = FALSE)
 library(ggplot2)
 library(glue)
+library(methods)
 library(MeltR)
 library(shiny)
+library(sicegar)
 
 # The UI consists of a navbar page, with a single drop down menu, "File" , which contains a single option "Add data".
 

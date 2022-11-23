@@ -3,7 +3,6 @@ server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
   #Upload Project File
-  
   upload <- observeEvent(eventExpr = input$inputFile,
                          handlerExpr = {
                            # Declaring variables
@@ -101,6 +100,41 @@ server <- function(input,output, session){
     showTab(inputId = "navbar",target = "Analysis")
   })
   
+  firstDerivativePlot <- function(df,plotSlider){
+    df = df[,c(3,4)]
+    columns = c("time","intensity")
+    colnames(df) = columns
+    time <- df$time
+    
+    dataInput <- data.frame(intensity = df$intensity, time = df$time)
+    #normalizedInput <- normalizeData(dataInput, dataInputName = "sample001")
+    parameterVector <- multipleFitFunction(dataInput = df,
+                                           model = "sigmoidal",
+                                           n_runs_min = 20,
+                                           n_runs_max = 500)
+    
+    #Check the results
+    if(parameterVector$isThisaFit){
+      intensityTheoretical <- sigmoidalFitFormula(time,
+                                                  maximum = parameterVector$maximum_Estimate,
+                                                  slopeParam = parameterVector$slopeParam_Estimate,
+                                                  midPoint = parameterVector$midPoint_Estimate)
+      
+      comparisonData <- cbind(dataInput, intensityTheoretical)
+      
+      require(ggplot2)
+      ggplot(comparisonData)+
+        geom_point(aes(x = time, y = intensity)) +
+        geom_line(aes(x = time, y = intensityTheoretical), color = "blue") +
+        xlab("Temperature") +
+        ylab("Absorbance") +
+        theme_classic() +
+        expand_limits(x = 0, y = 0) +
+        geom_vline(xintercept = input[[plotSlider]][1]) +
+        geom_vline(xintercept = input[[plotSlider]][2])
+    }
+  }
+  
   #Dynamically creates a renderPlot object of each absorbance readings
   observe({
     req(input$inputFile)
@@ -123,19 +157,9 @@ server <- function(input,output, session){
         plotDerivative = paste0("plotDerivative",myI)
         output[[plotDerivative]] <- renderPlot({
           data = values$masterFrame[values$masterFrame$Sample == myI,]
-          data %>%
-            arrange(Temperature) %>%
-            mutate(slope = (Absorbance - lag(Absorbance)) /
-                     (Temperature - lag(Temperature))) %>%
-            ggplot(aes(Temperature)) +
-            geom_line(aes(y = Absorbance), size = 1.2) +
-            geom_smooth(aes(y = slope * 20 + 1.4), se = FALSE, size = 0.8) +
-            theme_classic() +
-            geom_vline(xintercept = input[[plotSlider]][1]) +
-            geom_vline(xintercept = input[[plotSlider]][2])
-        })
-        
+          firstDerivativePlot(data,plotSlider)
       })
+    })
     }
   })
   
