@@ -18,10 +18,17 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                      fluidPage(
                                        sidebarLayout(
                                          sidebarPanel(
-                                           textInput(label = "Enter the Pathlength for each Absorbance Reading(separated by commas)",
+                                           textInput(label = "Enter the Pathlength for each absorbance reading. (Note, they should be separated by commas and have no spaces inbetween.)",
                                                      placeholder = "E.g: 2,5,3,2,...",
                                                      inputId = "pathlengths"),
-                                           fileInput(label = "Add Data",
+                                           textInput(label = "Enter the sequence information in the following order: Nucleic Acid, A sequence, and its complement)",
+                                                     placeholder = "E.g: RNA,CGAAAGGU,ACCUUUCG",
+                                                     inputId = "helixInput"),
+                                           selectInput("molState", 
+                                                       "Select the molecular state.(Please note that your selection will apply to all samples, beyond just the ones in the current dataset.)", 
+                                                       choices = c("Heteroduplex", "Homoduplex","Monomolecular"), 
+                                                       selected = "Heteroduplex"),
+                                           fileInput(label = "Select the dataset file.",                                        
                                                      inputId = "inputFile",
                                                      multiple = FALSE,
                                                      accept = ".csv")
@@ -40,7 +47,7 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                          sidebarPanel(
                                          ),
                                          mainPanel(
-                                           tableOutput("Console")
+                                           #tableOutput("Console")
                                          )
                                        )
                                      )
@@ -59,7 +66,14 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                               uiOutput("dataVisualContents"),
                             )
                           )
-                          
-                          
-                 )
+                 ),
+                 navbarMenu("Results",
+                            tabPanel("Vant Hoff Plots", 
+                                     fluidPage(
+                                         mainPanel(
+                                           plotOutput("vantplots"),
+                                         )
+                                       )
+                                     )
+                            )
 ) 
