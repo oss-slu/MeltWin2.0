@@ -1,26 +1,25 @@
-counter <- 1
-start <- 1
-molStateVal <- ""
-helix <- c()
+blank <- NULL #The blank for meltR input & background subtraction.
+counter <- 1 #Same as the "start" variable, but only utilized in processing dataset loop
+helix <- c() #The sequence information MeltR input.
+molStateVal <- "" #Molecular state MeltR input.
+myConnector = NULL #Variable in server that utilizes the "connecter" class.
+start <- 1 #Number that indicates the beggining iterations when implementing multiple datasets.
 
 #Connector class that houses MeltR code
 #constructObject() has to be called for each new method implemented. 
-connector <- setRefClass(Class = "connector",
-                         fields = list(df = "data.frame", 
-                                       NucAcid = "character",
-                                       blank = "double",
-                                       Mmodel = "character",
-                                       ranges = "list"
+connecter <- setRefClass(Class = "connecter",
+                         fields = c("df",
+                                    "NucAcid",
+                                    "blank",
+                                    "Mmodel" 
                          ),
                          methods = list(
                            #Creates MeltR object. 
                            constructObject = function(){
                              meltR.A(data_frame = df,
                                      blank = blank,
-                                     NucAcid = helix,
-                                     Mmodel = "Heteroduplex.2State",
-                                     fitTs = ranges
-                             )
+                                     NucAcid = NucAcid,
+                                     Mmodel = Mmodel)
                            },
                            #Constructs a plot containing the raw data
                            constructRawPlot = function(sampleNum){
@@ -29,19 +28,12 @@ connector <- setRefClass(Class = "connector",
                                geom_point() +
                                theme_classic()
                            },
-                           constructFirstDerivative = function(sampleNum){
-                             data = constructObject()
-                             data = data$Derivatives.data[data$Derivatives.data == sampleNum,]
-                             coeff = 4000
-                             upper = max(data$dA.dT)/max(data$Ct)+coeff
-                           },
                            #Constructs a plot of the first derivaitve and the raw data
                            constructFirstDerivative = function(sampleNum){
                              data = constructObject()
                              data = data$Derivatives.data[data$Derivatives.data == sampleNum,]
                              coeff = 4000 #Static number to shrink data to scale
                              upper = max(data$dA.dT)/max(data$Ct) + coeff
-                             
                              ggplot(data,aes(x = Temperature)) +
                                geom_point(aes(y = Absorbance)) +
                                geom_point(aes(y = (dA.dT/(Pathlength*Ct))/upper+min(Absorbance)),color="blue") +

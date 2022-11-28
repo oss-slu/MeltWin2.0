@@ -6,13 +6,23 @@ server <- function(input,output, session){
   upload <- observeEvent(eventExpr = input$inputFile,
                          handlerExpr = {
                            # Declaring variables
+                           req(input$inputFile)
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
                            molStateVal <<- input$molState
-                           helix <<- c(unlist(strsplit(input$helixInput,",")))
-                           req(input$inputFile)
+                           helix <<- trimws(strsplit(input$helixInput,",")[[1]],which="both")
+                           blank <<- as.numeric(input$blankSample)
+                           if(molStateVal == "Heteroduplex"){
+                             molStateVal <<- "Heteroduplex.2State"
+                           }else if(molStateVal == "Homoduplex"){
+                             molStateVal <<- "Homoduplex.2State"
+                           }else{
+                             molStateVal <<- "Monomolecular.2State"
+                           }
                            removeUI(
                              selector = "div:has(> #helixInput)"
-                             selector = "div:has(>> #molState)"
+                           )
+                           removeUI(
+                             selector="div:has(> #molState)"
                            )
                            fileName <- input$inputFile$datapath
                            cd <- read.csv(file = fileName,header = FALSE)
@@ -27,7 +37,7 @@ server <- function(input,output, session){
                            for (x in 2:readings) {
                              col <- df[x]
                              sample <- rep(c(counter),times = nrow(df[x]))
-                             pathlength <- rep(c(pathlengths[p]),times = nrow(df[x]))
+                             pathlength <- rep(c(as.numeric(pathlengths[p])),times = nrow(df[x]))
                              col <- df[x]
                              t <- data.frame(sample,pathlength,df[1],df[x])
                              names(t) <- names(tempFrame)
@@ -37,13 +47,17 @@ server <- function(input,output, session){
                            }
                            values$numReadings <- counter - 1
                            values$masterFrame <- rbind(values$masterFrame, tempFrame)
-                           values$uploaded <- 1
+                           myConnecter <<- connecter(df = values$masterFrame,
+                                                           NucAcid = helix,
+                                                           Mmodel = molStateVal,
+                                                           blank = blank)
                          }
   )
+  #Outputs the post-processed data frame
   output$Table <- renderTable({
     return(values$masterFrame)})
   
-  #code that hides "Plots" drop-down hidden until file successfully uploads
+  #Hides "Plots" drop-down hidden until file successfully uploads
   observeEvent(
     eventExpr = is.null(values$numReadings),
     handlerExpr = {
@@ -52,119 +66,86 @@ server <- function(input,output, session){
   )
   
   
-  #code that creates n tabPanels for the "Analysis" tabPanel
+  #Creates n tabPanels for the "Analysis" tabPanel
   observe({
     req(values$numReadings)
     lapply(start:values$numReadings,function(i){
-      tabName = paste("Sample",i,sep = " ")
-      plotName = paste0("plot",i)
-      plotFit = paste0("plotFit",i)
-      plotBoth = paste0("plotBoth",i)
-      plotSlider <- paste0("plotSlider",i)
-      data = values$masterFrame[values$masterFrame$Sample == i,]
-      xmin = round(min(data$Temperature),1)
-      xmax = round(max(data$Temperature),1)
-      plotDerivative = paste0("plotDerivative",i)
-      fitData = paste0("fit",i)
-      firstDerivative = paste0("firstDerivative",i)
-      bestFit = paste0("bestFit",i)
-      fitIterations = paste0("fitIteration",i)
-      appendTab(inputId = "tabs",
-                tab = tabPanel(
-                  tabName,
-                  fluidPage(
-                    sidebarLayout(
-                      sidebarPanel(
-                        #side-panel code
-                        h2("Features"),
-                        checkboxInput(inputId = firstDerivative,label = "First Derivative")
-                      ),mainPanel(
-                        #main-panel code
-                        conditionalPanel(
-                          condition = glue("!input.{firstDerivative}"),
-                          plotOutput(plotName)
-                        ),
-                        conditionalPanel(
-                          condition = glue("input.{firstDerivative}"),
-                          plotOutput(plotDerivative)
-                        ),
-                        sliderInput(plotSlider,
-                                    glue("Plot{i}: Range of values"),
-                                    min = xmin,
-                                    max = xmax,
-                                    value = c(xmin,xmax),
-                                    round = TRUE,
-                                    step = .10,
-                                    width = "85%")
+      if(i != blank){
+        data = values$masterFrame[values$masterFrame$Sample == i,]
+        xmin = round(min(data$Temperature),1)
+        xmax = round(max(data$Temperature),1)
+        plotBoth = paste0("plotBoth",i)
+        plotFit = paste0("plotFit",i)
+        plotName = paste0("plot",i)
+        plotSlider <- paste0("plotSlider",i)
+        plotDerivative = paste0("plotDerivative",i)
+        fitData = paste0("fit",i)
+        firstDerivative = paste0("firstDerivative",i)
+        bestFit = paste0("bestFit",i)
+        fitIterations = paste0("fitIteration",i)
+        tabName = paste("Sample",i,sep = " ")
+        appendTab(inputId = "tabs",
+                  tab = tabPanel(
+                    tabName,
+                    fluidPage(
+                      sidebarLayout(
+                        sidebarPanel(
+                          #side-panel code
+                          h2("Features"),
+                          checkboxInput(inputId = firstDerivative,label = "First Derivative")
+                        ),mainPanel(
+                          #main-panel code
+                          conditionalPanel(
+                            condition = glue("!input.{firstDerivative}"),
+                            plotOutput(plotName)
+                          ),
+                          conditionalPanel(
+                            condition = glue("input.{firstDerivative}"),
+                            plotOutput(plotDerivative)
+                          ),
+                          sliderInput(plotSlider,
+                                      glue("Plot{i}: Range of values"),
+                                      min = xmin,
+                                      max = xmax,
+                                      value = c(xmin,xmax),
+                                      round = TRUE,
+                                      step = .10,
+                                      width = "85%")
+                        )
                       )
                     )
-                  )
-                ))
-    })
+                  ))
+      }
+      })
     start <<- values$numReadings + 1
     showTab(inputId = "navbar",target = "Analysis")
   })
-  
-  firstDerivativePlot <- function(df,plotSlider){
-    df = df[,c(3,4)]
-    columns = c("time","intensity")
-    colnames(df) = columns
-    time <- df$time
-    
-    dataInput <- data.frame(intensity = df$intensity, time = df$time)
-    #normalizedInput <- normalizeData(dataInput, dataInputName = "sample001")
-    parameterVector <- multipleFitFunction(dataInput = df,
-                                           model = "sigmoidal",
-                                           n_runs_min = 20,
-                                           n_runs_max = 500)
-    
-    #Check the results
-    if(parameterVector$isThisaFit){
-      intensityTheoretical <- sigmoidalFitFormula(time,
-                                                  maximum = parameterVector$maximum_Estimate,
-                                                  slopeParam = parameterVector$slopeParam_Estimate,
-                                                  midPoint = parameterVector$midPoint_Estimate)
-      
-      comparisonData <- cbind(dataInput, intensityTheoretical)
-      
-      require(ggplot2)
-      ggplot(comparisonData)+
-        geom_point(aes(x = time, y = intensity)) +
-        geom_line(aes(x = time, y = intensityTheoretical), color = "blue") +
-        xlab("Temperature") +
-        ylab("Absorbance") +
-        theme_classic() +
-        expand_limits(x = 0, y = 0) +
-        geom_vline(xintercept = input[[plotSlider]][1]) +
-        geom_vline(xintercept = input[[plotSlider]][2])
-    }
-  }
   
   #Dynamically creates a renderPlot object of each absorbance readings
   observe({
     req(input$inputFile)
     for (i in 1:values$numReadings) {
-      local({
-        myI <- i 
-        plotSlider = paste0("plotSlider",myI)
-        #plot containing raw data
-        plotName = paste0("plot",myI)
-        output[[plotName]] <- renderPlot({
-          data = values$masterFrame[values$masterFrame$Sample == myI,]
-          ggplot(data, aes(x = Temperature, 
-                           y = Absorbance)) +
-            geom_point() + theme_classic() +
-            ylim(min(data$Absorbance),max(data$Absorbance) + 1) +
-            geom_vline(xintercept = input[[plotSlider]][1]) +
-            geom_vline(xintercept = input[[plotSlider]][2])
-        })
-        #plot containing first derivative with raw data
-        plotDerivative = paste0("plotDerivative",myI)
-        output[[plotDerivative]] <- renderPlot({
-          data = values$masterFrame[values$masterFrame$Sample == myI,]
-          firstDerivativePlot(data,plotSlider)
+      #if i != blank
+      if(i != 1){
+        local({
+          myI <- i 
+          plotDerivative = paste0("plotDerivative",myI)
+          plotName = paste0("plot",myI)
+          plotSlider = paste0("plotSlider",myI)
+          #plot containing raw data
+          output[[plotName]] <- renderPlot({
+            myConnecter$constructRawPlot(myI) +
+              geom_vline(xintercept = input[[plotSlider]][1]) +
+              geom_vline(xintercept = input[[plotSlider]][2])
+          })
+          #plot containing first derivative with raw data
+          output[[plotDerivative]] <- renderPlot({
+            myConnecter$constructFirstDerivative(myI) +
+              geom_vline(xintercept = input[[plotSlider]][1]) +
+              geom_vline(xintercept = input[[plotSlider]][2])
+          })
       })
-    })
+      }
     }
   })
   

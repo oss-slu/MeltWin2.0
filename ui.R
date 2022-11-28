@@ -18,6 +18,10 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                      fluidPage(
                                        sidebarLayout(
                                          sidebarPanel(
+                                           textInput(label = "Enter the blank sample for the dataset",
+                                                     placeholder = "E.g: 1",
+                                                     value = 1,
+                                                     inputId = "blankSample"),
                                            textInput(label = "Enter the Pathlength for each absorbance reading. (Note, they should be separated by commas and have no spaces inbetween.)",
                                                      placeholder = "E.g: 2,5,3,2,...",
                                                      inputId = "pathlengths"),
