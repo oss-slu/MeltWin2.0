@@ -125,8 +125,7 @@ server <- function(input,output, session){
   observe({
     req(input$inputFile)
     for (i in 1:values$numReadings) {
-      #if i != blank
-      if(i != 1){
+      if(i != blank){
         local({
           myI <- i 
           plotDerivative = paste0("plotDerivative",myI)
