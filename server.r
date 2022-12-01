@@ -251,6 +251,20 @@ server <- function(input,output, session){
     plot(LnConcentraion,InverseTemp)
     
   }, res = 100)
+  
+#Code that outputs the results table
+output$resulttable <- renderTable({
+  Model <- paste(molStateVal,".2State", sep = "")
+  data <- meltR.A(data_frame = df,
+                  blank = 1,
+                  NucAcid = helix,
+                  Mmodel = Model)
+  caluclations <- data$Method.2.data
+  InverseTemp <- caluclations$invT
+  LnConcentraion <- caluclations$lnCt
+  plot(LnConcentraion,InverseTemp)
+  
+}, res = 100)
 }
 
 

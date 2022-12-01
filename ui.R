@@ -78,6 +78,13 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                            plotOutput("vantplots"),
                                          )
                                        )
+                                     ),
+                            tabPanel("Results Table", 
+                                     fluidPage(
+                                       mainPanel(
+                                         plotOutput("resulttable"),
+                                       )
                                      )
+                            )
                             )
 ) 
