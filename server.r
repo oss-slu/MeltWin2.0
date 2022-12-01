@@ -51,6 +51,7 @@ server <- function(input,output, session){
                                                            NucAcid = helix,
                                                            Mmodel = molStateVal,
                                                            blank = blank)
+                           myConnecter$constructObject()
                          }
   )
   #Outputs the post-processed data frame

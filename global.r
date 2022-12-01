@@ -11,15 +11,16 @@ connecter <- setRefClass(Class = "connecter",
                          fields = c("df",
                                     "NucAcid",
                                     "blank",
-                                    "Mmodel" 
+                                    "Mmodel",
+                                    "object"
                          ),
                          methods = list(
                            #Creates MeltR object. 
                            constructObject = function(){
-                             meltR.A(data_frame = df,
-                                     blank = blank,
-                                     NucAcid = NucAcid,
-                                     Mmodel = Mmodel)
+                             .self$object <- meltR.A(data_frame = df,
+                                                     blank = blank,
+                                                     NucAcid = NucAcid,
+                                                     Mmodel = Mmodel)
                            },
                            #Constructs a plot containing the raw data
                            constructRawPlot = function(sampleNum){
@@ -30,8 +31,7 @@ connecter <- setRefClass(Class = "connecter",
                            },
                            #Constructs a plot of the first derivaitve and the raw data
                            constructFirstDerivative = function(sampleNum){
-                             data = constructObject()
-                             data = data$Derivatives.data[data$Derivatives.data == sampleNum,]
+                             data = .self$object$Derivatives.data[.self$object$Derivatives.data == sampleNum,]
                              coeff = 4000 #Static number to shrink data to scale
                              upper = max(data$dA.dT)/max(data$Ct) + coeff
                              ggplot(data,aes(x = Temperature)) +
