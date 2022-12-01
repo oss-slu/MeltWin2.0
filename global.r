@@ -38,6 +38,15 @@ connecter <- setRefClass(Class = "connecter",
                                geom_point(aes(y = Absorbance)) +
                                geom_point(aes(y = (dA.dT/(Pathlength*Ct))/upper+min(Absorbance)),color="blue") +
                                theme_classic()
+                           },
+                           #Constructs a plot of the best fit and the raw data
+                           constructBestFit = function(sampleNum){
+                             data = .self$object$Method.1.data
+                             data = data[data$Sample == sampleNum,]
+                             ggplot(data,aes(x = Temperature)) +
+                               geom_point(aes(y = Absorbance), color = "black") +
+                               geom_line(aes(y = Model), color = "red") +
+                               theme_classic()
                            }
                          )
 )
