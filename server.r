@@ -103,12 +103,16 @@ server <- function(input,output, session){
                             plotOutput(plotName)
                           ),
                           conditionalPanel(
-                            condition = glue("input.{firstDerivative}"),
+                            condition = glue("input.{firstDerivative} && !input.{bestFit}"),
                             plotOutput(plotDerivative)
                           ),
                           conditionalPanel(
-                            condition = glue("input.{bestFit}"),
+                            condition = glue("input.{bestFit} && !input.{firstDerivative}"),
                             plotOutput(plotBestFit)
+                          ),
+                          conditionalPanel(
+                            condition = glue("input.{firstDerivative} && input.{bestFit}"),
+                            plotOutput(plotBoth)
                           ),
                           sliderInput(plotSlider,
                                       glue("Plot{i}: Range of values"),
@@ -137,6 +141,7 @@ server <- function(input,output, session){
           myI <- i 
           plotDerivative = paste0("plotDerivative",myI)
           plotBestFit = paste0("plotBestFit",myI)
+          plotBoth = paste0("plotBoth",myI)
           plotName = paste0("plot",myI)
           plotSlider = paste0("plotSlider",myI)
           #plot containing raw data
@@ -154,6 +159,12 @@ server <- function(input,output, session){
           #plot containing best fit with raw data
           output[[plotBestFit]] <- renderPlot({
             myConnecter$constructBestFit(myI) + 
+              geom_vline(xintercept = input[[plotSlider]][1]) +
+              geom_vline(xintercept = input[[plotSlider]][2])
+          })
+          #plot containing best, first derivative, and raw data
+          output[[plotBoth]] <- renderPlot({
+            myConnecter$constructBoth(myI) + 
               geom_vline(xintercept = input[[plotSlider]][1]) +
               geom_vline(xintercept = input[[plotSlider]][2])
           })
