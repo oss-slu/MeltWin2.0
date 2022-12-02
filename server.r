@@ -1,4 +1,3 @@
-library(MeltR) #Needs to be removed when Anothy pushes code
 server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
@@ -240,12 +239,7 @@ server <- function(input,output, session){
 
   #code that plots a van't hoff plot
   output$vantplots <- renderPlot({
-    Model <- paste(molStateVal,".2State", sep = "")
-    data <- meltR.A(data_frame = df,
-                    blank = 1,
-                    NucAcid = helix,
-                    Mmodel = Model)
-    caluclations <- data$Method.2.data
+    caluclations <- myConnecter$gatherVantData()
     InverseTemp <- caluclations$invT
     LnConcentraion <- caluclations$lnCt
     plot(LnConcentraion,InverseTemp)
@@ -253,18 +247,23 @@ server <- function(input,output, session){
   }, res = 100)
   
 #Code that outputs the results table
-output$resulttable <- renderTable({
-  Model <- paste(molStateVal,".2State", sep = "")
-  data <- meltR.A(data_frame = df,
-                  blank = 1,
-                  NucAcid = helix,
-                  Mmodel = Model)
-  caluclations <- data$Method.2.data
-  InverseTemp <- caluclations$invT
-  LnConcentraion <- caluclations$lnCt
-  plot(LnConcentraion,InverseTemp)
   
-}, res = 100)
+output$resulttable <- renderTable({
+  data <-myConnecter$fitData()
+  return(data)
+})
+output$summarytable <- renderTable({
+  data <-myConnecter$summaryData1()
+  return(data)
+})
+output$summarytable2 <- renderTable({
+  data <-myConnecter$summaryData2()
+  return(data)
+})
+output$error <- renderTable({
+  data <-myConnecter$error()
+  return(data)
+})
 }
 
 

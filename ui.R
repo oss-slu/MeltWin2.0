@@ -4,7 +4,6 @@ library(glue)
 library(methods)
 library(MeltR)
 library(shiny)
-library(sicegar)
 
 # The UI consists of a navbar page, with a single drop down menu, "File" , which contains a single option "Add data".
 
@@ -82,7 +81,13 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                             tabPanel("Results Table", 
                                      fluidPage(
                                        mainPanel(
-                                         plotOutput("resulttable"),
+                                         "Individual fits",
+                                         tableOutput("resulttable"),
+                                         "Summary Tables",
+                                         tableOutput("summarytable"),
+                                         tableOutput("summarytable2"),
+                                         "Error",
+                                         tableOutput("error")
                                        )
                                      )
                             )
