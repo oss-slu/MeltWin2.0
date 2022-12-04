@@ -174,71 +174,6 @@ server <- function(input,output, session){
       }
     }
   })
-  
-  #Dynamically renders & outputs the created plots
-  #Dynamically renders & outputs inputSliders for each plot
-  #Output Structure: two plots & sliders per column
-  output$dataVisualContents <- renderUI({
-    req(input$inputFile)
-    lapply(1:values$numReadings, function(i){
-      plotSlider <- paste0("plotSlider",i)
-      plotName <- paste0("plot",i)
-      nextPlot <- paste0("plot",i + 1)
-      nextSlider = paste0("plotSlider",i + 1)
-      data <- values$masterFrame[values$masterFrame$Sample == i,]
-      xmin <- min(data$Temperature)
-      xmax <- max(data$Temperature)
-      #even # of plots
-      if (values$numReadings %% 2 == 0) {
-        if (i %% 2 != 0) {
-          div(
-            fluidRow(
-              column(6,plotOutput(plotName)),
-              column(6,plotOutput(nextPlot))
-            ),
-            fluidRow(
-              column(6,sliderInput(plotSlider,glue("Plot{i}: Range of values"),min = xmin,max = xmax,value = c(xmin,xmax))),
-              column(6,sliderInput(nextSlider,glue("Plot{i + 1}: Range of values"),min = xmin,max = xmax,value = c(xmin,xmax))),
-            ),
-            hr()
-          )
-        }
-        #odd # of plots
-      }else{
-        if (i == values$numReadings) {
-          tagList(
-            plotOutput(plotName),
-            sliderInput(plotSlider,glue("Plot{i}: Range of values"),min = xmin,max = xmax,value = c(xmin,xmax))
-          )
-        }else {
-          if (i %% 2 != 0) {
-            div(
-              fluidRow(
-                column(6,plotOutput(plotName)),
-                column(6,plotOutput(nextPlot))
-              ),
-              fluidRow(
-                column(6,sliderInput(plotSlider,glue("Plot{i}: Range of values"),min = xmin,max = xmax,value = c(xmin,xmax))),
-                column(6,sliderInput(nextSlider,glue("Plot{i+1}: Range of values"),min = xmin,max = xmax,value = c(xmin,xmax)))
-              ),
-              hr()
-            )
-          }
-        }
-      }
-    })
-  })
-  
-  #Dynamically output # of check boxes
-  output$checkboxes <- renderUI({
-    req(input$inputFile)
-    boxOutput <- lapply(1:values$numReadings, function(i){
-      plotName <- paste0("plot",i)
-      plotBox <- paste0("plotBox",i)
-      checkboxInput(plotBox,plotName,value = TRUE)
-    })
-    do.call(tagList,boxOutput)
-  })
 
   #code that plots a van't hoff plot
   output$vantplots <- renderPlot({
@@ -254,7 +189,3 @@ server <- function(input,output, session){
     
   }, res = 100)
 }
-
-
-# Run the app
-#shinyApp(ui = ui, server = server)
