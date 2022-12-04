@@ -44,6 +44,17 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                      )
                             )
                  ),
+                 tabPanel("Analysis",
+                            tabsetPanel(id = "tabs")),
+                 navbarMenu("Results",
+                            tabPanel("Vant Hoff Plots", 
+                                     fluidPage(
+                                         mainPanel(
+                                           plotOutput("vantplots"),
+                                         )
+                                       )
+                                     )
+                            ),
                  navbarMenu("Help",
                             tabPanel("Absorbance in MeltR", 
                                      fluidPage(
@@ -55,16 +66,6 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                          )
                                        )
                                      )
-                            ),
-                 ),tabPanel("Analysis",
-                            tabsetPanel(id = "tabs")),
-                 navbarMenu("Results",
-                            tabPanel("Vant Hoff Plots", 
-                                     fluidPage(
-                                         mainPanel(
-                                           plotOutput("vantplots"),
-                                         )
-                                       )
-                                     )
                             )
+                 )
 ) 
