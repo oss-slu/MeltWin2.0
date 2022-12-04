@@ -1,4 +1,3 @@
-library(MeltR) #Needs to be removed when Anothy pushes code
 server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
@@ -51,6 +50,7 @@ server <- function(input,output, session){
                                                            NucAcid = helix,
                                                            Mmodel = molStateVal,
                                                            blank = blank)
+                                                     
                            myConnecter$constructObject()
                          }
   )
@@ -168,6 +168,8 @@ server <- function(input,output, session){
               geom_vline(xintercept = input[[plotSlider]][1]) +
               geom_vline(xintercept = input[[plotSlider]][2])
           })
+          #Capture start and end ranges for baseline trimming 
+          ranges[[myI]] <<- c(input[[plotSlider]][1],input[[plotSlider]][2])
       })
       }
     }

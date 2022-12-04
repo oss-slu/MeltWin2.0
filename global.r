@@ -4,9 +4,8 @@ helix <- c() #The sequence information MeltR input.
 molStateVal <- "" #Molecular state MeltR input.
 myConnector = NULL #Variable in server that utilizes the "connecter" class.
 start <- 1 #Number that indicates the beggining iterations when implementing multiple datasets.
-
+ranges = list() #list of baseline ranges manually selected by user through ui slider. 
 #Connector class that houses MeltR code
-#constructObject() has to be called for each new method implemented. 
 connecter <- setRefClass(Class = "connecter",
                          fields = c("df",
                                     "NucAcid",
