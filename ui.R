@@ -66,6 +66,30 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                          )
                                        )
                                      )
+                            ),
+                 ),tabPanel("Analysis",
+                            tabsetPanel(id = "tabs")),
+                 tabPanel("Data Visualization",
+                          sidebarLayout(
+                            sidebarPanel(
+                              width = 3,
+                              h2(align = "center","Data Visualization"),
+                              strong("Check Which Plots to View"),
+                              uiOutput("checkboxes"),
+                              actionButton("automate","Automate Fitting Data")
+                            ),mainPanel(
+                              uiOutput("dataVisualContents"),
+                            )
+                          )
+                 ),
+                 navbarMenu("Results",
+                            tabPanel("Vant Hoff Plots", 
+                                     fluidPage(
+                                         mainPanel(
+                                           plotOutput("vantplots"),
+                                         )
+                                       )
+                                     )
                             )
                  )
 ) 
