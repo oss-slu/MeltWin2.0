@@ -11,7 +11,8 @@ server <- function(input,output, session){
                            molStateVal <<- input$molState
                            wavelengthVal <<- as.numeric(input$wavelength)
                            helix <<- trimws(strsplit(input$helixInput,",")[[1]],which="both")
-                           blank <<- as.numeric(input$blankSample)
+                           blank <<- strtoi(input$blankSample)
+                           print(typeof(blank))
                            if(molStateVal == "Heteroduplex"){
                              molStateVal <<- "Heteroduplex.2State"
                            }else if(molStateVal == "Homoduplex"){
