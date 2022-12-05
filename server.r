@@ -131,6 +131,7 @@ server <- function(input,output, session){
       })
     start <<- values$numReadings + 1
     showTab(inputId = "navbar",target = "Analysis")
+    showTab(inputId = "navbar",target = "Results")
   })
   
   #Dynamically creates a renderPlot object of each absorbance readings
