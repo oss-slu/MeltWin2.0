@@ -55,17 +55,17 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                        )
                                      )
                             ),
-                 navbarMenu("Help",
-                            tabPanel("Absorbance in MeltR", 
-                                     fluidPage(
-                                       sidebarLayout(
-                                         sidebarPanel(
-                                         ),
-                                         mainPanel(
-                                           #tableOutput("Console")
-                                         )
-                                       )
-                                     )
-                            ),
-                 )
+                 # navbarMenu("Help",
+                 #            tabPanel("Absorbance in MeltR", 
+                 #                     fluidPage(
+                 #                       sidebarLayout(
+                 #                         sidebarPanel(
+                 #                         ),
+                 #                         mainPanel(
+                 #                           #tableOutput("Console")
+                 #                         )
+                 #                       )
+                 #                     )
+                 #            ),
+                 # )
 ) 

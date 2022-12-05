@@ -58,11 +58,12 @@ server <- function(input,output, session){
   output$Table <- renderTable({
     return(values$masterFrame)})
   
-  #Hides "Plots" drop-down hidden until file successfully uploads
+  #Hides "Analysis" and "Results tabs until file successfully uploads
   observeEvent(
     eventExpr = is.null(values$numReadings),
     handlerExpr = {
       hideTab(inputId = "navbar",target = "Analysis")
+      hideTab(inputId = "navbar",target = "Results")
     }
   )
   
