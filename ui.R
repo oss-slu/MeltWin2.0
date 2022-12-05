@@ -4,7 +4,6 @@ library(glue)
 library(methods)
 library(MeltR)
 library(shiny)
-library(sicegar)
 
 # The UI consists of a navbar page, with a single drop down menu, "File" , which contains a single option "Add data".
 
@@ -74,10 +73,36 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                  navbarMenu("Results",
                             tabPanel("Vant Hoff Plots", 
                                      fluidPage(
+                                       mainPanel(
+                                         plotOutput("vantplots"),
+                                       )
+                                     )
+                            ),
+                            tabPanel("Results Table", 
+                                     fluidPage(
+                                       mainPanel(
+                                         "Individual fits",
+                                         tableOutput("resulttable"),
+                                         "Summary Tables",
+                                         tableOutput("summarytable"),
+                                         tableOutput("summarytable2"),
+                                         "Error",
+                                         tableOutput("error")
+                                       ),
+                                       sidebarLayout(
+                                         sidebarPanel(
+                                           "Dowload includes tables and Vant Hoff Plots",
+                                           textInput(label = "Enter the file name",
+                                                     inputId = "saveFile"),
+                                           radioButtons('format', 'Document format', c('PDF'),
+                                                        inline = TRUE),
+                                           downloadButton('downloadReport')
+                                         ),
                                          mainPanel(
-                                           plotOutput("vantplots"),
+                                           plotOutput('regPlot')
                                          )
                                        )
                                      )
                             )
+                 )
 ) 

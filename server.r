@@ -1,4 +1,3 @@
-library(MeltR) #Needs to be removed when Anothy pushes code
 server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
@@ -48,9 +47,9 @@ server <- function(input,output, session){
                            values$numReadings <- counter - 1
                            values$masterFrame <- rbind(values$masterFrame, tempFrame)
                            myConnecter <<- connecter(df = values$masterFrame,
-                                                           NucAcid = helix,
-                                                           Mmodel = molStateVal,
-                                                           blank = blank)
+                                                     NucAcid = helix,
+                                                     Mmodel = molStateVal,
+                                                     blank = blank)
                            myConnecter$constructObject()
                          }
   )
@@ -127,7 +126,7 @@ server <- function(input,output, session){
                     )
                   ))
       }
-      })
+    })
     start <<- values$numReadings + 1
     showTab(inputId = "navbar",target = "Analysis")
   })
@@ -168,7 +167,7 @@ server <- function(input,output, session){
               geom_vline(xintercept = input[[plotSlider]][1]) +
               geom_vline(xintercept = input[[plotSlider]][2])
           })
-      })
+        })
       }
     }
   })
@@ -237,20 +236,54 @@ server <- function(input,output, session){
     })
     do.call(tagList,boxOutput)
   })
-
+  
   #code that plots a van't hoff plot
   output$vantplots <- renderPlot({
-    Model <- paste(molStateVal,".2State", sep = "")
-    data <- meltR.A(data_frame = df,
-                    blank = 1,
-                    NucAcid = helix,
-                    Mmodel = Model)
-    caluclations <- data$Method.2.data
+    caluclations <- myConnecter$gatherVantData()
     InverseTemp <- caluclations$invT
     LnConcentraion <- caluclations$lnCt
     plot(LnConcentraion,InverseTemp)
     
   }, res = 100)
+  
+  #Code that outputs the results tables
+  
+  output$resulttable <- renderTable({
+    data <-myConnecter$fitData()
+    return(data)
+  })
+  output$summarytable <- renderTable({
+    data <-myConnecter$summaryData1()
+    return(data)
+  })
+  output$summarytable2 <- renderTable({
+    data <-myConnecter$summaryData2()
+    return(data)
+  })
+  output$error <- renderTable({
+    data <-myConnecter$error()
+    return(data)
+  })
+  
+  output$downloadReport <- downloadHandler(
+    name <<- input$saveFile,
+    filename = function() {
+      paste(name, sep = '.', "pdf")
+    },
+    content = function(file) {
+      src <- normalizePath('report.Rmd')
+      
+      # temporarily switch to the temp dir, in case you do not have write
+      # permission to the current working directory
+      owd <- setwd(tempdir())
+      on.exit(setwd(owd))
+      file.copy(src, 'report.Rmd', overwrite = TRUE)
+      
+      library(rmarkdown)
+      out <- render('report.Rmd',pdf_document())
+      file.rename(out, file)
+    }
+  )
 }
 
 

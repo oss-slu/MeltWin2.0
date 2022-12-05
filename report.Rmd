@@ -1,0 +1,30 @@
+---
+title: "Result Tables"
+output: pdf_document
+params:
+  n: NA
+
+---
+
+```{r}
+#Make the variables
+individualFits <- myConnecter$fitData()
+summaryTable1<-myConnecter$summaryData1()
+summaryTable2<-myConnecter$summaryData2()
+error <-myConnecter$error()
+caluclations <- myConnecter$gatherVantData()
+InverseTemp <- caluclations$invT
+LnConcentraion <- caluclations$lnCt
+```
+Plot
+```{r}
+plot(LnConcentraion,InverseTemp)
+```
+Tables
+
+```{r}
+individualFits
+summaryTable1
+summaryTable2
+error
+```
