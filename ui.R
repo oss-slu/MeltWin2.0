@@ -4,7 +4,6 @@ library(glue)
 library(methods)
 library(MeltR)
 library(shiny)
-library(sicegar)
 
 # The UI consists of a navbar page, with a single drop down menu, "File" , which contains a single option "Add data".
 
@@ -32,6 +31,12 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                                        "Select the molecular state.(Please note that your selection will apply to all samples, beyond just the ones in the current dataset.)", 
                                                        choices = c("Heteroduplex", "Homoduplex","Monomolecular"), 
                                                        selected = "Heteroduplex"),
+                                           selectInput("wavelength", 
+                                                       "Select the wavelength. (Note that thermodynamic parameters can only
+                                                                                 be collected for DNA at 260 nm.)", 
+                                                       choices = c("260", "300","295","290","285","280","275","270",
+                                                                   "265","260","255","250","245","240","235","230"), 
+                                                       selected = "260"),
                                            fileInput(label = "Select the dataset file.",                                        
                                                      inputId = "inputFile",
                                                      multiple = FALSE,
@@ -53,8 +58,20 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                                            plotOutput("vantplots"),
                                          )
                                        )
+                                     ),
+                            tabPanel("Results Table", 
+                                     fluidPage(
+                                       mainPanel(
+                                         "Individual fits",
+                                         tableOutput("resulttable"),
+                                         "Summary Tables",
+                                         tableOutput("summarytable"),
+                                         tableOutput("summarytable2"),
+                                         "Error",
+                                         tableOutput("error")
+                                       )
                                      )
-                            ),
+                            )
                  # navbarMenu("Help",
                  #            tabPanel("Absorbance in MeltR", 
                  #                     fluidPage(
@@ -68,4 +85,5 @@ ui <- navbarPage(title = "MeltShiny",id = "navbar",
                  #                     )
                  #            ),
                  # )
-) 
+                 )
+)

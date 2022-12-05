@@ -1,4 +1,3 @@
-library(MeltR) #Needs to be removed when Anothy pushes code
 server <- function(input,output, session){
   #Reactive list variable 
   values <- reactiveValues(masterFrame = NULL,numReadings = NULL)
@@ -9,11 +8,12 @@ server <- function(input,output, session){
                            req(input$inputFile)
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
                            molStateVal <<- input$molState
+                           wavelengthVal <<- as.numeric(input$wavelength)
                            helix <<- trimws(strsplit(input$helixInput,",")[[1]],which="both")
                            blank <<- as.numeric(input$blankSample)
-                           if(molStateVal == "Heteroduplex"){
+                           if (molStateVal == "Heteroduplex") {
                              molStateVal <<- "Heteroduplex.2State"
-                           }else if(molStateVal == "Homoduplex"){
+                           } else if (molStateVal == "Homoduplex") {
                              molStateVal <<- "Homoduplex.2State"
                            }else{
                              molStateVal <<- "Monomolecular.2State"
@@ -22,7 +22,7 @@ server <- function(input,output, session){
                              selector = "div:has(> #helixInput)"
                            )
                            removeUI(
-                             selector="div:has(> #molState)"
+                             selector = "div:has(> #molState)"
                            )
                            fileName <- input$inputFile$datapath
                            cd <- read.csv(file = fileName,header = FALSE)
@@ -72,7 +72,7 @@ server <- function(input,output, session){
   observe({
     req(values$numReadings)
     lapply(start:values$numReadings,function(i){
-      if(i != blank){
+      if (i != blank) {
         data = values$masterFrame[values$masterFrame$Sample == i,]
         xmin = round(min(data$Temperature),1)
         xmax = round(max(data$Temperature),1)
@@ -138,7 +138,7 @@ server <- function(input,output, session){
   observe({
     req(input$inputFile)
     for (i in 1:values$numReadings) {
-      if(i != blank){
+      if (i != blank) {
         local({
           myI <- i 
           plotDerivative = paste0("plotDerivative",myI)
@@ -177,17 +177,31 @@ server <- function(input,output, session){
 
   #code that plots a van't hoff plot
   output$vantplots <- renderPlot({
-    Model <- paste(molStateVal,".2State", sep = "")
-    data <- meltR.A(data_frame = df,
-                    blank = 1,
-                    NucAcid = helix,
-                    Mmodel = Model)
-    caluclations <- data$Method.2.data
+    caluclations <- myConnecter$gatherVantData()
     InverseTemp <- caluclations$invT
     LnConcentraion <- caluclations$lnCt
     plot(LnConcentraion,InverseTemp)
     
   }, res = 100)
+  
+#Code that outputs the results table
+  
+output$resulttable <- renderTable({
+  data <-myConnecter$fitData()
+  return(data)
+})
+output$summarytable <- renderTable({
+  data <-myConnecter$summaryData1()
+  return(data)
+})
+output$summarytable2 <- renderTable({
+  data <-myConnecter$summaryData2()
+  return(data)
+})
+output$error <- renderTable({
+  data <-myConnecter$error()
+  return(data)
+})
 }
 
 
