@@ -9,6 +9,7 @@ server <- function(input,output, session){
                            req(input$inputFile)
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
                            molStateVal <<- input$molState
+                           wavelengthVal <<- as.numeric(input$wavelength)
                            helix <<- trimws(strsplit(input$helixInput,",")[[1]],which="both")
                            blank <<- as.numeric(input$blankSample)
                            if(molStateVal == "Heteroduplex"){
