@@ -2,6 +2,7 @@ blank <- NULL #The blank for meltR input & background subtraction.
 counter <- 1 #Same as the "start" variable, but only utilized in processing dataset loop
 helix <- c() #The sequence information MeltR input.
 molStateVal <- "" #Molecular state MeltR input.
+wavelengthVal <- "" # Wavelength MeltR input.
 myConnector = NULL #Variable in server that utilizes the "connecter" class.
 start <- 1 #Number that indicates the beggining iterations when implementing multiple datasets.
 

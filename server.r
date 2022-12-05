@@ -8,11 +8,12 @@ server <- function(input,output, session){
                            req(input$inputFile)
                            pathlengths <- c(unlist(strsplit(input$pathlengths,",")))
                            molStateVal <<- input$molState
+                           wavelengthVal <<- as.numeric(input$wavelength)
                            helix <<- trimws(strsplit(input$helixInput,",")[[1]],which="both")
                            blank <<- as.numeric(input$blankSample)
-                           if(molStateVal == "Heteroduplex"){
+                           if (molStateVal == "Heteroduplex") {
                              molStateVal <<- "Heteroduplex.2State"
-                           }else if(molStateVal == "Homoduplex"){
+                           } else if (molStateVal == "Homoduplex") {
                              molStateVal <<- "Homoduplex.2State"
                            }else{
                              molStateVal <<- "Monomolecular.2State"
@@ -21,7 +22,7 @@ server <- function(input,output, session){
                              selector = "div:has(> #helixInput)"
                            )
                            removeUI(
-                             selector="div:has(> #molState)"
+                             selector = "div:has(> #molState)"
                            )
                            fileName <- input$inputFile$datapath
                            cd <- read.csv(file = fileName,header = FALSE)
@@ -70,7 +71,7 @@ server <- function(input,output, session){
   observe({
     req(values$numReadings)
     lapply(start:values$numReadings,function(i){
-      if(i != blank){
+      if (i != blank) {
         data = values$masterFrame[values$masterFrame$Sample == i,]
         xmin = round(min(data$Temperature),1)
         xmax = round(max(data$Temperature),1)
@@ -135,7 +136,7 @@ server <- function(input,output, session){
   observe({
     req(input$inputFile)
     for (i in 1:values$numReadings) {
-      if(i != blank){
+      if (i != blank) {
         local({
           myI <- i 
           plotDerivative = paste0("plotDerivative",myI)
