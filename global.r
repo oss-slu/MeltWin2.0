@@ -59,6 +59,41 @@ connecter <- setRefClass(Class = "connecter",
                                geom_line(data2,mapping = aes(x = Temperature, y = Model), color = "red") + #best fit 
                                geom_point(data1, mapping = aes(x = Temperature, y = (dA.dT/(Pathlength*Ct))/upper+min(Absorbance)), color = "blue") + #first derivative
                                theme_classic()
+                           },
+                           #returns the data needed to create the vant hoff plot
+                           gatherVantData = function(){
+                             data = .self$object$Method.2.data
+                             return(data)
+                           },
+                           #returns the individual fit table data
+                            fitData = function(){
+                             #sample = .self$object$Method.1.indvfits$Sample
+                             #ct = .self$object$Method.1.indvfits$Ct
+                             #h = .self$object$Method.1.indvfits$H
+                             #s = .self$object$Method.1.indvfits$S
+                             #g = .self$object$Method.1.indvfits$G
+                             #tm = .self$object$Method.1.indvfits$Tm
+                             #indvCurves = data.frame(sample, ct,h,g,tm)
+                             indvCurves=.self$object$Method.1.indvfits 
+                             return(indvCurves)
+                            },
+                           summaryData1 = function(){
+                             summaryData=.self$object$Summary
+                             #indvidualfits = summaryData[1,]
+                             #Tmversuslnct = summaryData[2,]
+                             #summary = data.frame(indvidualfits, Tmversuslnct)
+                             return(summaryData[1,])
+                           },
+                           summaryData2 = function(){
+                             summaryData=.self$object$Summary
+                             #indvidualfits = summaryData[1,]
+                             #Tmversuslnct = summaryData[2,]
+                             #summary = data.frame(indvidualfits, Tmversuslnct)
+                             return(summaryData[2,])
+                           },
+                           error = function(){
+                             error = .self$object[3]
+                             return(error)
                            }
                          )
 )
